@@ -1,12 +1,12 @@
-/SebraeGuides/[Ll]ibrary/
-/SebraeGuides/[Tt]emp/
-/SebraeGuides/[Oo]bj/
-/SebraeGuides/[Bb]uild/
-/SebraeGuides/[Bb]uilds/
-/SebraeGuides/[Mm]emoryCaptures/
-/SebraeGuides/[Mm]emoryProfiler/
-/SebraeGuides/Logs/
-/SebraeGuides/UserSettings/
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Oo]bj/
+**/[Bb]uild/
+**/[Bb]uilds/
+**/[Mm]emoryCaptures/
+**/[Mm]emoryProfiler/
+**/Logs/
+**/UserSettings/
 
 # Arquivos gerados por IDEs (VS Code, Visual Studio, Rider)
 .vs/
