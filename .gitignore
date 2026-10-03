@@ -1,0 +1,29 @@
+/SebraeGuides/[Ll]ibrary/
+/SebraeGuides/[Tt]emp/
+/SebraeGuides/[Oo]bj/
+/SebraeGuides/[Bb]uild/
+/SebraeGuides/[Bb]uilds/
+/SebraeGuides/[Mm]emoryCaptures/
+/SebraeGuides/[Mm]emoryProfiler/
+/SebraeGuides/Logs/
+/SebraeGuides/UserSettings/
+
+# Arquivos gerados por IDEs (VS Code, Visual Studio, Rider)
+.vs/
+.idea/
+*.sln
+*.csproj
+*.unityproj
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
