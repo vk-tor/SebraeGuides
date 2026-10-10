@@ -10764,6 +10764,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1331433258}
   - component: {fileID: 1331433257}
+  - component: {fileID: 1331433259}
   m_Layer: 0
   m_Name: posicoes_npc
   m_TagString: Untagged
@@ -10788,7 +10789,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -10801,13 +10802,25 @@ Transform:
   m_GameObject: {fileID: 1331433256}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -64.282, y: 1.643, z: -59.59}
+  m_LocalPosition: {x: -61.888, y: 1.672, z: -59.776}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1366447981}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1331433259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331433256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55298aa5916d815488c55e889ac43e0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1351058435
 GameObject:
   m_ObjectHideFlags: 0
