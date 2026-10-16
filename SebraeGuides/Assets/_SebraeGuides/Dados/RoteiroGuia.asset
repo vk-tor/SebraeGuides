@@ -1,0 +1,188 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a3ea6aedddf6844870ef4415e97568, type: 3}
+  m_Name: RoteiroGuia
+  m_EditorClassIdentifier: 
+  nomeDoGuia: Guia
+  falas:
+  - id: R1
+    texto: "Ol\xE1! Bem-vindo ao Sebraelab. Eu sou o guia e vou te acompanhar nesta
+      visita."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: R2
+      evento: 
+  - id: R2
+    texto: "O Sebraelab \xE9 o hub de inova\xE7\xE3o aberta do Sebrae: um espa\xE7o
+      colaborativo para empreendedores, startups, estudantes e parceiros."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: R3
+      evento: 
+  - id: R3
+    texto: "Para andar, empurre o anal\xF3gico para a frente, mire num c\xEDrculo
+      no ch\xE3o e solte. Para virar, empurre para os lados. Para apertar bot\xF5es,
+      aponte e use o gatilho."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Entendi
+      proximaFala: R4
+      evento: 
+  - id: R4
+    texto: "Antes de come\xE7ar, pegue o seu crach\xE1 de visitante aqui no balc\xE3o."
+    dica: "Aponte para o crach\xE1 e segure o bot\xE3o lateral do controle."
+    audio: {fileID: 0}
+    opcoes: []
+  - id: R5
+    texto: "Tudo certo! A primeira parada \xE9 a arena de eventos."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Vamos!
+      proximaFala: 
+      evento: ir_arena
+  - id: A1
+    texto: "Esta \xE9 a arena. Aqui acontecem palestras, oficinas e apresenta\xE7\xF5es
+      de projetos."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: A2
+      evento: 
+  - id: A2
+    texto: "Aperte o bot\xE3o Ligar a TV, no painel \xE0 sua frente, para ver alguns
+      eventos que j\xE1 passaram por aqui."
+    dica: "Aponte para o bot\xE3o Ligar a TV e aperte o gatilho."
+    audio: {fileID: 0}
+    opcoes: []
+  - id: A3
+    texto: Agora vamos para o coworking.
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Quero saber mais
+      proximaFala: A3
+      evento: mais
+    - rotulo: "Pr\xF3ximo ponto"
+      proximaFala: 
+      evento: ir_coworking
+  - id: C1
+    texto: "No coworking, empreendedores dividem as esta\xE7\xF5es de trabalho e
+      os sof\xE1s e trabalham lado a lado."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: C2
+      evento: 
+  - id: C2
+    texto: "Muitas ideias passam pelo design thinking: imers\xE3o, idea\xE7\xE3o,
+      prototipa\xE7\xE3o e implementa\xE7\xE3o."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: C3
+      evento: 
+  - id: C3
+    texto: "Pegue um post-it na estante da parede e cole no quadro \xE0 sua frente
+      para deixar a sua ideia no mural."
+    dica: "Pegue o post-it amarelo com o bot\xE3o lateral e solte em cima do quadro."
+    audio: {fileID: 0}
+    opcoes: []
+  - id: C4
+    texto: "Ideia registrada! Vamos at\xE9 a copa."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Vamos!
+      proximaFala: 
+      evento: ir_copa
+  - id: K1
+    texto: "Esta \xE9 a copa. Muita parceria come\xE7a numa conversa durante o caf\xE9."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: K2
+      evento: 
+  - id: K2
+    texto: "Nas mesas ao lado acontecem reuni\xF5es r\xE1pidas e mentorias."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Quero saber mais
+      proximaFala: K2
+      evento: mais
+    - rotulo: "Pr\xF3ximo ponto"
+      proximaFala: 
+      evento: ir_fundos
+  - id: F1
+    texto: "Chegamos \xE0 sala dos fundos. Puxe a ma\xE7aneta para abrir a porta
+      de vidro."
+    dica: "Aponte para a ma\xE7aneta e aperte o bot\xE3o lateral."
+    audio: {fileID: 0}
+    opcoes: []
+  - id: F2
+    texto: "Esta sala \xE9 usada para [fun\xE7\xE3o a confirmar com o material do
+      professor]."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: F3
+      evento: 
+  - id: F3
+    texto: "Voc\xEA conheceu os cinco espa\xE7os. Volte para a recep\xE7\xE3o para
+      encerrar a visita."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Voltar
+      proximaFala: 
+      evento: ir_retorno
+  - id: E1
+    texto: "Obrigado pela visita! Voc\xEA conheceu 5 de 5 espa\xE7os do Sebraelab."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: Continuar
+      proximaFala: E2
+      evento: 
+  - id: E2
+    texto: "Para conhecer o espa\xE7o pessoalmente, procure o Sebrae no Maranh\xE3o."
+    dica: 
+    audio: {fileID: 0}
+    opcoes:
+    - rotulo: "Recome\xE7ar"
+      proximaFala: 
+      evento: recomecar
+    - rotulo: Encerrar
+      proximaFala: 
+      evento: encerrar
+  - id: AVISO_IR
+    texto: "Teleporte para o c\xEDrculo com a placa Pr\xF3xima parada. Te espero
+      l\xE1!"
+    dica: 
+    audio: {fileID: 0}
+    opcoes: []
+  - id: FIM
+    texto: "At\xE9 a pr\xF3xima!"
+    dica: 
+    audio: {fileID: 0}
+    opcoes: []
