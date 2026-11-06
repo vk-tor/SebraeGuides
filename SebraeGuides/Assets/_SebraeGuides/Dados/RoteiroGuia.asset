@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a3ea6aedddf6844870ef4415e97568, type: 3}
   m_Name: RoteiroGuia
   m_EditorClassIdentifier: 
-  nomeDoGuia: Guia
+  nomeDoGuia: "Prof. Ot\xE1vio"
   falas:
   - id: R1
-    texto: "Ol\xE1! Bem-vindo ao Sebraelab. Eu sou o guia e vou te acompanhar nesta
-      visita."
+    texto: "Ol\xE1! Bem-vindo ao Sebraelab. Eu sou o Professor Ot\xE1vio e vou te
+      acompanhar nesta visita guiada."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: a9c90864cf8ac534ebc80ac6065b161a, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: R2
@@ -27,7 +27,7 @@ MonoBehaviour:
     texto: "O Sebraelab \xE9 o hub de inova\xE7\xE3o aberta do Sebrae: um espa\xE7o
       colaborativo para empreendedores, startups, estudantes e parceiros."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: b1ac84dbc1805b54aa33f99da4b789a4, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: R3
@@ -37,7 +37,7 @@ MonoBehaviour:
       no ch\xE3o e solte. Para virar, empurre para os lados. Para apertar bot\xF5es,
       aponte e use o gatilho."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: d620794a8cf2f344f8d91f87a699d5e1, type: 3}
     opcoes:
     - rotulo: Entendi
       proximaFala: R4
@@ -45,21 +45,21 @@ MonoBehaviour:
   - id: R4
     texto: "Antes de come\xE7ar, pegue o seu crach\xE1 de visitante aqui no balc\xE3o."
     dica: "Aponte para o crach\xE1 e segure o bot\xE3o lateral do controle."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: ae9930c57e5329c4dbb503137d9db011, type: 3}
     opcoes: []
   - id: R5
     texto: "Tudo certo! A primeira parada \xE9 a arena de eventos."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 4b801035027b6714592cdefb47f31a40, type: 3}
     opcoes:
     - rotulo: Vamos!
       proximaFala: 
       evento: ir_arena
   - id: A1
-    texto: "Esta \xE9 a arena. Aqui acontecem palestras, oficinas e apresenta\xE7\xF5es
-      de projetos."
+    texto: "Esta \xE9 a arena de eventos. Aqui acontecem palestras, oficinas pr\xE1ticas,
+      maratonas de inova\xE7\xE3o e apresenta\xE7\xF5es de projetos."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 5dad092fcb0254e48bc238277118c45e, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: A2
@@ -68,12 +68,12 @@ MonoBehaviour:
     texto: "Aperte o bot\xE3o Ligar a TV, no painel \xE0 sua frente, para ver alguns
       eventos que j\xE1 passaram por aqui."
     dica: "Aponte para o bot\xE3o Ligar a TV e aperte o gatilho."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 7c87d08987dd4154eb29d86c5b61fc12, type: 3}
     opcoes: []
   - id: A3
-    texto: Agora vamos para o coworking.
+    texto: "Agora vamos conhecer o espa\xE7o de coworking."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 135e7a54052be9740aac4a2f63e601c1, type: 3}
     opcoes:
     - rotulo: Quero saber mais
       proximaFala: A3
@@ -85,7 +85,7 @@ MonoBehaviour:
     texto: "No coworking, empreendedores dividem as esta\xE7\xF5es de trabalho e
       os sof\xE1s e trabalham lado a lado."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 124758d85ec5315428efa78e06222707, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: C2
@@ -94,7 +94,7 @@ MonoBehaviour:
     texto: "Muitas ideias passam pelo design thinking: imers\xE3o, idea\xE7\xE3o,
       prototipa\xE7\xE3o e implementa\xE7\xE3o."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 2176c6b65b29be343bcfd96f62795336, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: C3
@@ -103,28 +103,30 @@ MonoBehaviour:
     texto: "Pegue um post-it na estante da parede e cole no quadro \xE0 sua frente
       para deixar a sua ideia no mural."
     dica: "Pegue o post-it amarelo com o bot\xE3o lateral e solte em cima do quadro."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 94c0d32a008bdcb44b2f9b34b217daee, type: 3}
     opcoes: []
   - id: C4
-    texto: "Ideia registrada! Vamos at\xE9 a copa."
+    texto: "Ideia registrada com sucesso! Vamos at\xE9 a copa e \xE1rea de conviv\xEAncia."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: d59fde255232a2942b2af753aca46654, type: 3}
     opcoes:
     - rotulo: Vamos!
       proximaFala: 
       evento: ir_copa
   - id: K1
-    texto: "Esta \xE9 a copa. Muita parceria come\xE7a numa conversa durante o caf\xE9."
+    texto: "Esta \xE9 a copa. Muita parceria importante come\xE7a numa conversa informal
+      durante o caf\xE9."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 502e7b8f29e28b7418a3e6273504b11a, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: K2
       evento: 
   - id: K2
-    texto: "Nas mesas ao lado acontecem reuni\xF5es r\xE1pidas e mentorias."
+    texto: "Nas mesas ao lado acontecem reuni\xF5es r\xE1pidas, conex\xF5es e mentorias
+      para novos neg\xF3cios."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: d8328bca4f5716048aee87dd98e19110, type: 3}
     opcoes:
     - rotulo: Quero saber mais
       proximaFala: K2
@@ -136,22 +138,22 @@ MonoBehaviour:
     texto: "Chegamos \xE0 sala dos fundos. Puxe a ma\xE7aneta para abrir a porta
       de vidro."
     dica: "Aponte para a ma\xE7aneta e aperte o bot\xE3o lateral."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 32d35267648af82469215388659820ee, type: 3}
     opcoes: []
   - id: F2
-    texto: "Esta sala \xE9 usada para [fun\xE7\xE3o a confirmar com o material do
-      professor]."
+    texto: "Esta sala reservada \xE9 usada para reuni\xF5es estrat\xE9gicas, oficinas
+      focadas e atendimento especializado a empreendedores."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 02ebeb1e0ebeb074293a01ceddbcf5d3, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: F3
       evento: 
   - id: F3
-    texto: "Voc\xEA conheceu os cinco espa\xE7os. Volte para a recep\xE7\xE3o para
-      encerrar a visita."
+    texto: "Excelente! Voc\xEA conheceu os cinco espa\xE7os. Volte para a recep\xE7\xE3o
+      para encerrar a visita."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 317fbaac8f5fd4b4f960414013782cc9, type: 3}
     opcoes:
     - rotulo: Voltar
       proximaFala: 
@@ -159,7 +161,7 @@ MonoBehaviour:
   - id: E1
     texto: "Obrigado pela visita! Voc\xEA conheceu 5 de 5 espa\xE7os do Sebraelab."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 83c1fa810f8bd1749aa389736f769e1e, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: E2
@@ -167,7 +169,7 @@ MonoBehaviour:
   - id: E2
     texto: "Para conhecer o espa\xE7o pessoalmente, procure o Sebrae no Maranh\xE3o."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: b5c314025c5cba1409c28804da9c1a91, type: 3}
     opcoes:
     - rotulo: "Recome\xE7ar"
       proximaFala: 
@@ -179,10 +181,10 @@ MonoBehaviour:
     texto: "Teleporte para o c\xEDrculo com a placa Pr\xF3xima parada. Te espero
       l\xE1!"
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 32ce334c88cd9d34680f89bfda93fb97, type: 3}
     opcoes: []
   - id: FIM
-    texto: "At\xE9 a pr\xF3xima!"
+    texto: "At\xE9 a pr\xF3xima visita! Foi um prazer te receber no Sebraelab!"
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 2e9132669b18846458dc475f213ef14e, type: 3}
     opcoes: []
