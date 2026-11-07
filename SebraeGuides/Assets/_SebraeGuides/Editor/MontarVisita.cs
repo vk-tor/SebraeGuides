@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.XR.CoreUtils;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -30,6 +32,11 @@ namespace SebraeGuides.Ferramentas
         const string PastaMateriais = Pasta + "/Materiais";
         const string CaminhoRoteiro = PastaDados + "/RoteiroGuia.asset";
         const string CaminhoModelo = "Assets/Sebraelab3D/Sebrae Lab.fbx";
+        const string PastaModelos = Pasta + "/Modelos";
+        // Professor Otávio: convertido do GLB enviado ao grupo (com as animações) e reduzido de 350 mil para 42 mil triângulos para o Quest 2.
+        const string CaminhoAvatar = PastaModelos + "/ProfessorOtavio_Guia.fbx";
+        const string CaminhoAnimador = PastaModelos + "/Guia.controller";
+        const float AlturaAvatar = 1.43f; // altura do modelo original, usada só se o FBX vier em outra escala
         const string CaminhoAncora = "Assets/VRTemplateAssets/Prefabs/Teleport/Teleport Anchor.prefab";
         const string CaminhoClique = "Assets/VRTemplateAssets/Audio/Button_22_click.wav";
         const string NomeRaiz = "Sebraelab360 (gerado)";
@@ -124,7 +131,7 @@ namespace SebraeGuides.Ferramentas
                     "Isto vai:\n\n" +
                     "• ligar os colisores do modelo do Sebraelab;\n" +
                     "• criar (ou atualizar) a cena Assets/Scenes/Visita.unity, copiada da SampleScene;\n" +
-                    "• montar o guia, os 5 pontos de interesse, o teleporte e as 5 interações.\n\n" +
+                    "• montar o guia (Professor Otávio, com animações), os 5 pontos de interesse, o teleporte e as 5 interações.\n\n" +
                     "A SampleScene não é alterada. Rodar de novo apaga e refaz a montagem " +
                     "(ajustes feitos à mão nos objetos gerados se perdem; o roteiro é mantido).",
                     "Montar", "Cancelar"))
@@ -138,6 +145,9 @@ namespace SebraeGuides.Ferramentas
                 EditorUtility.DisplayProgressBar("Sebrae Guides", "Ajustando o modelo do Sebraelab...", 0.1f);
                 ConfigurarModelo();
 
+                EditorUtility.DisplayProgressBar("Sebrae Guides", "Ajustando o avatar do guia...", 0.2f);
+                ConfigurarAvatar();
+
                 EditorUtility.DisplayProgressBar("Sebrae Guides", "Abrindo a cena Visita...", 0.3f);
                 var cena = AbrirCenaVisita();
                 if (!cena.IsValid()) return;
@@ -145,6 +155,7 @@ namespace SebraeGuides.Ferramentas
                 GarantirPasta(PastaDados);
                 GarantirPasta(PastaMateriais);
                 var roteiro = CarregarOuCriarRoteiro(false);
+                VincularAudiosDasFalas(roteiro);
 
                 EditorUtility.DisplayProgressBar("Sebrae Guides", "Desligando objetos do template...", 0.45f);
                 var antiga = BuscarRaiz(cena, NomeRaiz);
@@ -249,6 +260,195 @@ namespace SebraeGuides.Ferramentas
             }
         }
 
+        // Animações que repetem sem parar. O aceno (Wave_Welcome) toca uma vez.
+        static readonly string[] ClipesEmLoop = { "Idle_Tour", "Talk_Explain", "Walk_Tour" };
+
+        static void ConfigurarAvatar()
+        {
+            var importador = AssetImporter.GetAtPath(CaminhoAvatar) as ModelImporter;
+            if (importador == null)
+            {
+                Debug.LogWarning($"[Sebrae Guides] Não encontrei {CaminhoAvatar}. O guia vai usar a cápsula provisória.");
+                return;
+            }
+
+            bool mudou = false;
+            if (importador.animationType != ModelImporterAnimationType.Generic) { importador.animationType = ModelImporterAnimationType.Generic; mudou = true; }
+            if (importador.avatarSetup != ModelImporterAvatarSetup.CreateFromThisModel) { importador.avatarSetup = ModelImporterAvatarSetup.CreateFromThisModel; mudou = true; }
+            if (!importador.importAnimation) { importador.importAnimation = true; mudou = true; }
+            if (importador.importCameras) { importador.importCameras = false; mudou = true; }
+            if (importador.importLights) { importador.importLights = false; mudou = true; }
+
+            // Nomes curtos ("Professor|Idle_Tour" vira "Idle_Tour") e loop nas animações contínuas.
+            var clipes = importador.defaultClipAnimations;
+            foreach (var clipe in clipes)
+            {
+                string nome = clipe.takeName;
+                int barra = nome.LastIndexOf('|');
+                if (barra >= 0) nome = nome.Substring(barra + 1);
+                clipe.name = nome;
+                clipe.loopTime = System.Array.IndexOf(ClipesEmLoop, nome) >= 0;
+            }
+
+            var atuais = importador.clipAnimations;
+            bool clipesIguais = atuais != null && atuais.Length == clipes.Length &&
+                                clipes.All(c => atuais.Any(a => a.name == c.name && a.takeName == c.takeName && a.loopTime == c.loopTime));
+            if (!clipesIguais && clipes.Length > 0)
+            {
+                importador.clipAnimations = clipes;
+                mudou = true;
+            }
+
+            if (mudou)
+            {
+                importador.SaveAndReimport();
+                Debug.Log($"[Sebrae Guides] Avatar do guia reimportado: {string.Join(", ", clipes.Select(c => c.name))}.");
+            }
+        }
+
+        static AnimationClip BuscarClipe(List<AnimationClip> clipes, string nome)
+        {
+            return clipes.Find(c => c.name == nome) ?? clipes.Find(c => c.name.EndsWith("|" + nome));
+        }
+
+        /// <summary>Cria o Animator do guia: Parado (padrão), Falando e Acenando.</summary>
+        static RuntimeAnimatorController CriarAnimador()
+        {
+            var clipes = AssetDatabase.LoadAllAssetsAtPath(CaminhoAvatar).OfType<AnimationClip>()
+                .Where(c => !c.name.StartsWith("__preview__")).ToList();
+            var parado = BuscarClipe(clipes, "Idle_Tour");
+            var falando = BuscarClipe(clipes, "Talk_Explain");
+            var acenando = BuscarClipe(clipes, "Wave_Welcome");
+            if (!parado)
+            {
+                Debug.LogWarning("[Sebrae Guides] O avatar não tem a animação Idle_Tour; o guia vai ficar parado sem animação.");
+                return null;
+            }
+
+            AssetDatabase.DeleteAsset(CaminhoAnimador);
+            var controlador = AnimatorController.CreateAnimatorControllerAtPath(CaminhoAnimador);
+            controlador.AddParameter("Falando", AnimatorControllerParameterType.Bool);
+            controlador.AddParameter("Acenar", AnimatorControllerParameterType.Trigger);
+
+            var maquina = controlador.layers[0].stateMachine;
+            var estadoParado = maquina.AddState("Parado", new Vector3(300f, 0f));
+            estadoParado.motion = parado;
+            maquina.defaultState = estadoParado;
+
+            AnimatorState estadoFalando = null;
+            if (falando)
+            {
+                estadoFalando = maquina.AddState("Falando", new Vector3(300f, 120f));
+                estadoFalando.motion = falando;
+
+                var ida = estadoParado.AddTransition(estadoFalando);
+                ida.hasExitTime = false;
+                ida.duration = 0.25f;
+                ida.AddCondition(AnimatorConditionMode.If, 0f, "Falando");
+
+                var volta = estadoFalando.AddTransition(estadoParado);
+                volta.hasExitTime = false;
+                volta.duration = 0.3f;
+                volta.AddCondition(AnimatorConditionMode.IfNot, 0f, "Falando");
+            }
+
+            if (acenando)
+            {
+                var estadoAcenando = maquina.AddState("Acenando", new Vector3(560f, 60f));
+                estadoAcenando.motion = acenando;
+
+                var entrada = maquina.AddAnyStateTransition(estadoAcenando);
+                entrada.hasExitTime = false;
+                entrada.duration = 0.2f;
+                entrada.canTransitionToSelf = false;
+                entrada.AddCondition(AnimatorConditionMode.If, 0f, "Acenar");
+
+                if (estadoFalando)
+                {
+                    var paraFalando = estadoAcenando.AddTransition(estadoFalando);
+                    paraFalando.hasExitTime = true;
+                    paraFalando.exitTime = 0.9f;
+                    paraFalando.duration = 0.25f;
+                    paraFalando.AddCondition(AnimatorConditionMode.If, 0f, "Falando");
+                }
+
+                var paraParado = estadoAcenando.AddTransition(estadoParado);
+                paraParado.hasExitTime = true;
+                paraParado.exitTime = 0.9f;
+                paraParado.duration = 0.25f;
+                if (estadoFalando) paraParado.AddCondition(AnimatorConditionMode.IfNot, 0f, "Falando");
+            }
+
+            AssetDatabase.SaveAssets();
+            return controlador;
+        }
+
+        /// <summary>Coloca o professor dentro de "Modelo", em pé, virado para a frente do guia e com os pés no chão.</summary>
+        static Animator ColocarAvatar(Transform modelo)
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CaminhoAvatar);
+            if (!prefab) return null;
+
+            var avatar = (GameObject)PrefabUtility.InstantiatePrefab(prefab, modelo.gameObject.scene);
+            avatar.name = "Professor Otavio";
+            avatar.transform.SetParent(modelo, false);
+            avatar.transform.localPosition = Vector3.zero;
+            avatar.transform.localRotation = Quaternion.identity;
+            AlinharAvatar(avatar.transform, modelo);
+
+            var animador = avatar.GetComponent<Animator>();
+            if (!animador) animador = avatar.AddComponent<Animator>();
+            animador.runtimeAnimatorController = CriarAnimador();
+            animador.applyRootMotion = false;
+            animador.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+
+            foreach (var colisor in avatar.GetComponentsInChildren<Collider>(true)) Object.DestroyImmediate(colisor);
+            return animador;
+        }
+
+        // O FBX vem do Blender; em vez de confiar na conversão de eixos, o avatar é alinhado pelo próprio esqueleto:
+        // cabeça acima do quadril, dedos dos pés para a frente do guia e sola no chão.
+        static void AlinharAvatar(Transform avatar, Transform referencia)
+        {
+            var quadril = BuscarNoModelo(avatar, "mixamorig:Hips");
+            var cabeca = BuscarNoModelo(avatar, "mixamorig:Head");
+            var pe = BuscarNoModelo(avatar, "mixamorig:LeftFoot");
+            var dedos = BuscarNoModelo(avatar, "mixamorig:LeftToeBase");
+
+            if (quadril && cabeca)
+            {
+                Vector3 cima = cabeca.position - quadril.position;
+                if (cima.sqrMagnitude > 1e-6f)
+                    avatar.rotation = Quaternion.FromToRotation(cima.normalized, referencia.up) * avatar.rotation;
+            }
+
+            if (pe && dedos)
+            {
+                Vector3 frente = Vector3.ProjectOnPlane(dedos.position - pe.position, referencia.up);
+                if (frente.sqrMagnitude > 1e-6f)
+                    avatar.RotateAround(avatar.position, referencia.up, Vector3.SignedAngle(frente, referencia.forward, referencia.up));
+            }
+
+            var limites = Limites(avatar);
+            if (limites.size.y > 0.01f && (limites.size.y < 1f || limites.size.y > 2.2f))
+            {
+                avatar.localScale *= AlturaAvatar / limites.size.y;
+                limites = Limites(avatar);
+            }
+            if (limites.size.y > 0.01f) avatar.position += referencia.up * (referencia.position.y - limites.min.y);
+
+            Debug.Log($"[Sebrae Guides] Avatar do guia colocado: altura {limites.size.y:0.00} m.");
+        }
+
+        static Bounds Limites(Transform raiz)
+        {
+            var renderers = raiz.GetComponentsInChildren<Renderer>(true);
+            if (renderers.Length == 0) return new Bounds(raiz.position, Vector3.zero);
+            var limites = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++) limites.Encapsulate(renderers[i].bounds);
+            return limites;
+        }
+
         static Scene AbrirCenaVisita()
         {
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(CenaVisita) == null)
@@ -296,6 +496,49 @@ namespace SebraeGuides.Ferramentas
             }
 
             Debug.Log($"[Sebrae Guides] Desligados na raiz: {string.Join(", ", desligados)}. Sobras do Blender desligadas no modelo: {sobras}.");
+        }
+
+        const string PastaFalas = Pasta + "/Audio/Falas";
+
+        // Vozes: cada arquivo Audio/Falas/<ID>.ogg (ou .mp3 / .wav) é ligado à fala de mesmo ID no roteiro.
+        // Falas sem arquivo continuam só com texto. Os textos do roteiro não são alterados.
+        static void VincularAudiosDasFalas(RoteiroGuia roteiro)
+        {
+            if (!roteiro || roteiro.falas == null || !AssetDatabase.IsValidFolder(PastaFalas)) return;
+
+            foreach (var guid in AssetDatabase.FindAssets("t:AudioClip", new[] { PastaFalas }))
+            {
+                var importador = AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(guid)) as AudioImporter;
+                if (importador == null) continue;
+                var config = importador.defaultSampleSettings;
+                if (importador.forceToMono && config.loadType == AudioClipLoadType.DecompressOnLoad &&
+                    config.compressionFormat == AudioCompressionFormat.Vorbis) continue;
+                importador.forceToMono = true; // voz espacial: mono basta e o APK fica menor
+                config.loadType = AudioClipLoadType.DecompressOnLoad;
+                config.compressionFormat = AudioCompressionFormat.Vorbis;
+                config.quality = 0.6f;
+                importador.defaultSampleSettings = config;
+                importador.SaveAndReimport();
+            }
+
+            int ligadas = 0;
+            foreach (var fala in roteiro.falas)
+            {
+                if (fala == null || string.IsNullOrEmpty(fala.id)) continue;
+                AudioClip clipe = null;
+                foreach (var extensao in new[] { ".ogg", ".mp3", ".wav" })
+                {
+                    clipe = AssetDatabase.LoadAssetAtPath<AudioClip>($"{PastaFalas}/{fala.id}{extensao}");
+                    if (clipe) break;
+                }
+                if (!clipe) continue;
+                fala.audio = clipe;
+                ligadas++;
+            }
+
+            EditorUtility.SetDirty(roteiro);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[Sebrae Guides] Vozes: {ligadas} de {roteiro.falas.Count} falas com áudio ({PastaFalas}).");
         }
 
         static RoteiroGuia CarregarOuCriarRoteiro(bool restaurar)
@@ -456,20 +699,27 @@ namespace SebraeGuides.Ferramentas
         {
             var objeto = Filho(raiz, "Guia").gameObject;
 
-            var modelo = Filho(objeto.transform, "Modelo (troque pelo modelo final)");
-            var corpo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            corpo.name = "Corpo";
-            corpo.transform.SetParent(modelo, false);
-            corpo.transform.localPosition = new Vector3(0f, 0.85f, 0f);
-            corpo.transform.localScale = new Vector3(0.5f, 0.85f, 0.5f);
-            Pintar(corpo, Mat("Guia_Corpo", new Color(0.0f, 0.37f, 0.72f)));
+            var modelo = Filho(objeto.transform, "Modelo");
+            var animador = ColocarAvatar(modelo);
+            if (!animador)
+            {
+                // Sem o FBX do professor: cápsula provisória.
+                var corpo = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                corpo.name = "Corpo";
+                corpo.transform.SetParent(modelo, false);
+                corpo.transform.localPosition = new Vector3(0f, 0.85f, 0f);
+                corpo.transform.localScale = new Vector3(0.5f, 0.85f, 0.5f);
+                Object.DestroyImmediate(corpo.GetComponent<Collider>());
+                Pintar(corpo, Mat("Guia_Corpo", new Color(0.0f, 0.37f, 0.72f)));
 
-            var visor = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            visor.name = "Visor";
-            visor.transform.SetParent(modelo, false);
-            visor.transform.localPosition = new Vector3(0f, 1.48f, 0.21f);
-            visor.transform.localScale = new Vector3(0.34f, 0.1f, 0.08f);
-            Pintar(visor, Mat("Guia_Visor", new Color(0.05f, 0.05f, 0.08f)));
+                var visor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                visor.name = "Visor";
+                visor.transform.SetParent(modelo, false);
+                visor.transform.localPosition = new Vector3(0f, 1.48f, 0.21f);
+                visor.transform.localScale = new Vector3(0.34f, 0.1f, 0.08f);
+                Object.DestroyImmediate(visor.GetComponent<Collider>());
+                Pintar(visor, Mat("Guia_Visor", new Color(0.05f, 0.05f, 0.08f)));
+            }
 
             // O guia não é interagível de propósito: como alvo grande, ele "roubava" o raio do controle
             // (o raio de longe procura alvos num cone) e impedia de apertar os botões do balão e de pegar o crachá.
@@ -477,7 +727,10 @@ namespace SebraeGuides.Ferramentas
             guia = objeto.AddComponent<GuiaNPC>();
             guia.modelo = modelo;
 
-            var voz = objeto.AddComponent<AudioSource>();
+            // A voz sai da altura da cabeça do guia (o objeto Guia fica no chão).
+            var pontoDaVoz = Filho(objeto.transform, "Voz");
+            pontoDaVoz.localPosition = new Vector3(0f, 1.35f, 0f);
+            var voz = pontoDaVoz.gameObject.AddComponent<AudioSource>();
             voz.playOnAwake = false;
             voz.spatialBlend = 1f;
             voz.minDistance = 1f;
@@ -488,6 +741,13 @@ namespace SebraeGuides.Ferramentas
             dialogo.roteiro = roteiro;
             dialogo.voz = voz;
             dialogo.somClique = clique;
+
+            if (animador && animador.runtimeAnimatorController)
+            {
+                var animacao = objeto.AddComponent<AnimacaoGuia>();
+                animacao.animador = animador;
+                animacao.dialogo = dialogo;
+            }
 
             // O balão fica ao lado do guia, na altura dos olhos e um pouco à frente dele.
             // Em cima da cabeça, o corpo do guia ficava na frente dos botões e bloqueava o raio do controle.
@@ -591,41 +851,61 @@ namespace SebraeGuides.Ferramentas
 
         static GameObject CriarCracha(Transform pai, AudioClip clique)
         {
+            // De pé num suporte na borda do balcão (tampo a 0,731 m, borda do lado do visitante em z ≈ -62,02),
+            // virado para o ponto de chegada A0. Deitado no meio do tampo, o crachá ocupava menos de 1 grau
+            // na vista do visitante e o raio batia no balcão antes dele. Assim ocupa cerca de 8 graus.
+            const float YawCracha = 160.6f;
+            var suporte = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            suporte.name = "I2 Suporte do cracha";
+            suporte.transform.SetParent(pai, false);
+            suporte.transform.position = new Vector3(-59.30f, 0.738f, -62.16f);
+            suporte.transform.rotation = Quaternion.Euler(0f, YawCracha, 0f);
+            suporte.transform.localScale = new Vector3(0.16f, 0.014f, 0.08f);
+            Object.DestroyImmediate(suporte.GetComponent<Collider>());
+            Pintar(suporte, Mat("Metal", new Color(0.75f, 0.77f, 0.8f)));
+
             var raiz = Filho(pai, "I2 Cracha de visitante");
-            // Tampo do balcão a 0,731 m. Fica parado até ser pego (FisicaAoSoltar); com gravidade desde o início,
-            // o crachá afundava no tampo e o raio do controle batia no balcão antes dele.
-            raiz.position = new Vector3(-59.30f, 0.739f, -62.55f);
-            raiz.rotation = Quaternion.Euler(90f, 160f, 0f);
+            raiz.position = new Vector3(-59.30f, 0.826f, -62.15f);
+            raiz.rotation = Quaternion.Euler(15f, YawCracha, 0f); // inclinado 15 graus para trás, como num porta-crachá
+
+            // A parte visual fica separada para crescer quando o raio aponta (DestaqueAoApontar).
+            var visual = Filho(raiz, "Visual");
 
             var corpo = GameObject.CreatePrimitive(PrimitiveType.Cube);
             corpo.name = "Corpo";
-            corpo.transform.SetParent(raiz, false);
-            corpo.transform.localScale = new Vector3(0.10f, 0.14f, 0.012f);
+            corpo.transform.SetParent(visual, false);
+            corpo.transform.localScale = new Vector3(0.12f, 0.16f, 0.012f);
+            Object.DestroyImmediate(corpo.GetComponent<Collider>());
             Pintar(corpo, Mat("Cracha", new Color(0.93f, 0.95f, 0.98f)));
 
             var faixa = GameObject.CreatePrimitive(PrimitiveType.Cube);
             faixa.name = "Faixa";
-            faixa.transform.SetParent(raiz, false);
-            faixa.transform.localPosition = new Vector3(0f, 0.049f, 0f);
-            faixa.transform.localScale = new Vector3(0.10f, 0.032f, 0.013f);
+            faixa.transform.SetParent(visual, false);
+            faixa.transform.localPosition = new Vector3(0f, 0.062f, 0f);
+            faixa.transform.localScale = new Vector3(0.12f, 0.036f, 0.013f);
             Object.DestroyImmediate(faixa.GetComponent<Collider>());
             Pintar(faixa, Mat("Destaque", CorDestaque));
 
             var rotulo = new GameObject("Texto", typeof(RectTransform));
-            rotulo.transform.SetParent(raiz, false);
+            rotulo.transform.SetParent(visual, false);
             rotulo.transform.localPosition = new Vector3(0f, -0.012f, -0.0068f);
             var texto = rotulo.AddComponent<TextMeshPro>();
             texto.text = "VISITANTE";
-            texto.fontSize = 0.16f;
+            texto.fontSize = 0.19f;
             texto.fontStyle = FontStyles.Bold;
             texto.alignment = TextAlignmentOptions.Center;
             texto.color = new Color(0.07f, 0.11f, 0.19f);
-            ((RectTransform)rotulo.transform).sizeDelta = new Vector2(0.10f, 0.04f);
+            ((RectTransform)rotulo.transform).sizeDelta = new Vector2(0.12f, 0.05f);
+
+            // Área de pegar maior que o crachá (20 x 24 cm). Como ele é guardado ao ser solto,
+            // a caixa maior não atrapalha nenhuma física.
+            var area = raiz.gameObject.AddComponent<BoxCollider>();
+            area.size = new Vector3(0.20f, 0.24f, 0.06f);
 
             var corpoFisico = raiz.gameObject.AddComponent<Rigidbody>();
             corpoFisico.mass = 0.05f;
             corpoFisico.isKinematic = true;
-            corpoFisico.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            corpoFisico.useGravity = false;
             var pegar = raiz.gameObject.AddComponent<XRGrabInteractable>();
             pegar.throwOnDetach = false;
             pegar.useDynamicAttach = true;
@@ -635,7 +915,8 @@ namespace SebraeGuides.Ferramentas
             var gatilho = raiz.gameObject.AddComponent<GatilhoInteracao>();
             gatilho.evento = "pegou_cracha";
             gatilho.som = clique;
-            raiz.gameObject.AddComponent<FisicaAoSoltar>();
+            raiz.gameObject.AddComponent<DestaqueAoApontar>().alvo = visual;
+            raiz.gameObject.AddComponent<GuardarAoSoltar>();
             return raiz.gameObject;
         }
 
@@ -660,13 +941,75 @@ namespace SebraeGuides.Ferramentas
             tela.imagem = foto;
             tela.legenda = legenda;
             tela.som = clique;
-            tela.legendas = new[]
+
+            var fotos = CarregarFotosTV(out var legendas);
+            if (fotos.Length > 0)
             {
-                "Palestra de abertura\n(troque por uma foto real)",
-                "Oficina de inovação\n(troque por uma foto real)",
-                "Apresentação de projetos\n(troque por uma foto real)",
-            };
+                tela.fotos = fotos;
+                tela.legendas = legendas;
+            }
+            else
+            {
+                tela.legendas = new[]
+                {
+                    "Palestra de abertura\n(troque por uma foto real)",
+                    "Oficina de inovação\n(troque por uma foto real)",
+                    "Apresentação de projetos\n(troque por uma foto real)",
+                };
+            }
             return tela;
+        }
+
+        const string PastaFotos = Pasta + "/Fotos";
+
+        // Fotos da TV: todas as imagens da pasta Fotos, em ordem de nome (TV_01, TV_02...).
+        // Legendas em Fotos/legendas.txt, uma linha por foto, no formato "legenda | crédito".
+        static Sprite[] CarregarFotosTV(out string[] legendas)
+        {
+            legendas = new string[0];
+            if (!AssetDatabase.IsValidFolder(PastaFotos)) return new Sprite[0];
+
+            var caminhos = AssetDatabase.FindAssets("t:Texture2D", new[] { PastaFotos })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Distinct()
+                .OrderBy(c => c, System.StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var fotos = new List<Sprite>();
+            foreach (var caminho in caminhos)
+            {
+                var importador = AssetImporter.GetAtPath(caminho) as TextureImporter;
+                if (importador != null && (importador.textureType != TextureImporterType.Sprite || !importador.mipmapEnabled))
+                {
+                    importador.textureType = TextureImporterType.Sprite;
+                    importador.spriteImportMode = SpriteImportMode.Single;
+                    importador.mipmapEnabled = true; // evita a imagem "piscar" de longe no óculos
+                    importador.SaveAndReimport();
+                }
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(caminho);
+                if (sprite) fotos.Add(sprite);
+            }
+
+            var linhas = new List<string>();
+            var arquivo = AssetDatabase.LoadAssetAtPath<TextAsset>(PastaFotos + "/legendas.txt");
+            if (arquivo)
+            {
+                foreach (var bruta in arquivo.text.Split('\n'))
+                {
+                    string linha = bruta.Trim();
+                    if (linha.Length == 0 || linha.StartsWith("#")) continue;
+                    int barra = linha.IndexOf('|');
+                    linhas.Add(barra < 0
+                        ? linha
+                        : $"{linha.Substring(0, barra).Trim()}\n<size=60%>{linha.Substring(barra + 1).Trim()}</size>");
+                }
+            }
+
+            legendas = new string[fotos.Count];
+            for (int i = 0; i < fotos.Count; i++) legendas[i] = i < linhas.Count ? linhas[i] : string.Empty;
+
+            Debug.Log($"[Sebrae Guides] TV da arena: {fotos.Count} foto(s) e {System.Math.Min(linhas.Count, fotos.Count)} legenda(s) de {PastaFotos}.");
+            return fotos.ToArray();
         }
 
         static GameObject CriarPostIt(Transform pai)

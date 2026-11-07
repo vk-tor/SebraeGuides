@@ -31,6 +31,12 @@ namespace SebraeGuides
         /// <summary>Disparado quando o visitante aperta um botão que tem evento.</summary>
         public event Action<string> AoEvento;
 
+        /// <summary>Disparado sempre que uma fala aparece no balão (a animação do guia usa).</summary>
+        public event Action<Fala> AoMostrarFala;
+
+        /// <summary>Disparado quando o balão fecha.</summary>
+        public event Action AoFechar;
+
         public string FalaAtual { get; private set; }
 
         readonly List<Button> botoesCriados = new List<Button>();
@@ -83,7 +89,7 @@ namespace SebraeGuides
             {
                 bool mostrarDica = !temOpcoes && !string.IsNullOrEmpty(fala.dica);
                 textoDica.gameObject.SetActive(mostrarDica);
-                textoDica.text = mostrarDica ? fala.dica : string.Empty;
+                textoDica.text = mostrarDica ? DicaComTecla(fala.dica) : string.Empty;
             }
 
             if (voz)
@@ -95,6 +101,8 @@ namespace SebraeGuides
                     voz.Play();
                 }
             }
+
+            AoMostrarFala?.Invoke(fala);
         }
 
         /// <summary>Mostra de novo a última fala (usado quando o visitante seleciona o guia).</summary>
@@ -107,6 +115,25 @@ namespace SebraeGuides
         {
             if (balao) balao.SetActive(false);
             if (voz) voz.Stop();
+            AoFechar?.Invoke();
+        }
+
+        // Só dentro do Unity: completa a dica com a tecla do XR Device Simulator.
+        // No Quest (APK) a dica aparece como está no roteiro.
+        static string DicaComTecla(string dica)
+        {
+#if UNITY_EDITOR
+            if (!string.IsNullOrEmpty(dica))
+            {
+                string texto = dica.ToLowerInvariant();
+                string acao = null;
+                if (texto.Contains("botão lateral") || texto.Contains("botao lateral")) acao = "segure G";
+                else if (texto.Contains("gatilho")) acao = "clique com o botão esquerdo";
+                if (acao != null)
+                    return $"{dica}\n<color=#C7D2E0>No simulador: aperte Y, mire com o mouse e {acao}.</color>";
+            }
+#endif
+            return dica;
         }
 
         public void DefinirContador(string texto)

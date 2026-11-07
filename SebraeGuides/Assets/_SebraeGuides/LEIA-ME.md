@@ -43,7 +43,7 @@ Controles no Quest:
 
 | Parada | Interação que libera a próxima |
 |---|---|
-| A0 Recepção | Pegar o crachá no balcão |
+| A0 Recepção | Pegar o crachá de pé no suporte do balcão (ele cresce quando o raio aponta e some quando é solto) |
 | A1 Arena | Botão "Ligar a TV" no painel |
 | A2 Coworking | Levar o post-it da estante até o mural |
 | A3 Copa | (só conversa) |
@@ -57,8 +57,9 @@ Controles no Quest:
 | Texto das falas e botões | Menu Sebrae Guides > Editar as falas do guia (arquivo `Dados/RoteiroGuia.asset`) |
 | Áudio de uma fala | Mesmo arquivo, campo "Audio" da fala |
 | Título e texto de um painel | Hierarchy > Sebraelab360 (gerado) > Pontos de interesse > POI ... (componente Ponto De Interesse) |
-| Fotos da TV | Hierarchy > Interacoes > I3 TV - tela, componente Tela TV, lista "Fotos" (importe as imagens como Sprite) |
-| Modelo do guia | Hierarchy > Guia > "Modelo (troque pelo modelo final)": coloque o modelo dentro e apague "Corpo" e "Visor". Não coloque XR Interactable no guia: ele rouba o raio dos botões do balão |
+| Fotos da TV | Pasta `Fotos`: as imagens entram em ordem de nome (TV_01, TV_02...) e as legendas ficam em `Fotos/legendas.txt` ("legenda \| crédito", uma linha por foto). Depois de trocar, rode o item 1 do menu. Fotos atuais: Google Maps (contribuições de visitantes) |
+| Modelo do guia | O guia é o Professor Otávio (`Modelos/ProfessorOtavio_Guia.fbx`, 42 mil triângulos, 4 animações). Para trocar, substitua esse FBX por outro com o mesmo nome e rode o item 1 do menu. Não coloque XR Interactable nem colisor no guia: ele rouba o raio dos botões do balão |
+| Animação do guia | Componente Animacao Guia no objeto Guia: falas em que ele acena e quanto tempo gesticula por fala. Os estados ficam em `Modelos/Guia.controller` (refeito pelo item 1) |
 | Posição do guia em cada parada | Hierarchy > Posicoes do guia |
 | Luzes | Hierarchy > Luzes (desligue se ficar claro demais) |
 
@@ -80,6 +81,10 @@ Atenção: se você rodar o item 1 do menu de novo, ajustes feitos à mão dentr
 | DialogoGuia | Balão de fala com botões |
 | RoteiroGuia | Arquivo com as falas (ScriptableObject) |
 | GuiaNPC | Guia: troca de posição e olha para o visitante |
+| AnimacaoGuia | Guia gesticula enquanto fala e acena na chegada e na despedida |
+| DestaqueAoApontar | Objeto cresce e o controle vibra quando o raio aponta para ele (crachá) |
+| GuardarAoSoltar | Objeto encolhe e some quando é solto (crachá) |
+| FisicaAoSoltar | Objeto fica parado até ser pego e cai normalmente depois (post-it) |
 | PontoDeInteresse | Detecta o visitante e mostra o painel do espaço |
 | GatilhoInteracao | Avisa a visita quando algo é pego, apertado ou encaixado |
 | TelaTV | TV da arena com fotos e legendas |

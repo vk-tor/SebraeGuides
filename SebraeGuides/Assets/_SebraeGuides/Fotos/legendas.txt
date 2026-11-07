@@ -1,0 +1,8 @@
+# Legendas da TV da arena: uma linha por foto, na ordem dos arquivos (TV_01, TV_02...).
+# Formato: legenda | crédito. Linhas que começam com # são ignoradas.
+# Depois de trocar fotos ou legendas, rode Sebrae Guides > 1. Montar a visita.
+O Sebraelab de São Luís | Foto: Google Maps
+Game Jam+ São Luís, edição 2019 | Foto: Google Maps
+Palestra sobre a evolução dos games | Foto: Google Maps
+Comunidade reunida no espaço de eventos | Foto: Google Maps
+Mão na massa no coworking | Foto: Google Maps

@@ -18,7 +18,7 @@ MonoBehaviour:
     texto: "Ol\xE1! Bem-vindo ao Sebraelab. Eu sou o guia e vou te acompanhar nesta
       visita."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 9d4e56947e072fa479277775ace1ca2a, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: R2
@@ -27,7 +27,7 @@ MonoBehaviour:
     texto: "O Sebraelab \xE9 o hub de inova\xE7\xE3o aberta do Sebrae: um espa\xE7o
       colaborativo para empreendedores, startups, estudantes e parceiros."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 18acc058055b0c74a8494fde76c88cad, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: R3
@@ -37,7 +37,7 @@ MonoBehaviour:
       no ch\xE3o e solte. Para virar, empurre para os lados. Para apertar bot\xF5es,
       aponte e use o gatilho."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: d0348ac6644563a4496bf6f5f9437421, type: 3}
     opcoes:
     - rotulo: Entendi
       proximaFala: R4
@@ -45,12 +45,12 @@ MonoBehaviour:
   - id: R4
     texto: "Antes de come\xE7ar, pegue o seu crach\xE1 de visitante aqui no balc\xE3o."
     dica: "Aponte para o crach\xE1 e segure o bot\xE3o lateral do controle."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: a0c4821ec629c3a43a9c208aeb46b6b6, type: 3}
     opcoes: []
   - id: R5
     texto: "Tudo certo! A primeira parada \xE9 a arena de eventos."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: da4c2104fd45c3d43bdf7b1102df47a6, type: 3}
     opcoes:
     - rotulo: Vamos!
       proximaFala: 
@@ -59,7 +59,7 @@ MonoBehaviour:
     texto: "Esta \xE9 a arena. Aqui acontecem palestras, oficinas e apresenta\xE7\xF5es
       de projetos."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: e963ee55b3af67045aab17bfc65ca56a, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: A2
@@ -68,12 +68,12 @@ MonoBehaviour:
     texto: "Aperte o bot\xE3o Ligar a TV, no painel \xE0 sua frente, para ver alguns
       eventos que j\xE1 passaram por aqui."
     dica: "Aponte para o bot\xE3o Ligar a TV e aperte o gatilho."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 2411d9729927ead47acf040734be2778, type: 3}
     opcoes: []
   - id: A3
     texto: Agora vamos para o coworking.
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 0a125c1b7c1ce554a983b763379c1300, type: 3}
     opcoes:
     - rotulo: Quero saber mais
       proximaFala: A3
@@ -85,7 +85,7 @@ MonoBehaviour:
     texto: "No coworking, empreendedores dividem as esta\xE7\xF5es de trabalho e
       os sof\xE1s e trabalham lado a lado."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: c5d9744d2cbc0c542a7bb00db1b1643d, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: C2
@@ -94,7 +94,7 @@ MonoBehaviour:
     texto: "Muitas ideias passam pelo design thinking: imers\xE3o, idea\xE7\xE3o,
       prototipa\xE7\xE3o e implementa\xE7\xE3o."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: a5ecee6057197614f9110fefd71ecd0e, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: C3
@@ -103,12 +103,12 @@ MonoBehaviour:
     texto: "Pegue um post-it na estante da parede e cole no quadro \xE0 sua frente
       para deixar a sua ideia no mural."
     dica: "Pegue o post-it amarelo com o bot\xE3o lateral e solte em cima do quadro."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 0f99eca5c0c0b6a47a1e1ff80b9403e6, type: 3}
     opcoes: []
   - id: C4
     texto: "Ideia registrada! Vamos at\xE9 a copa."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 7e7208fc2a00fb445a4fcbd1922a3b52, type: 3}
     opcoes:
     - rotulo: Vamos!
       proximaFala: 
@@ -116,7 +116,7 @@ MonoBehaviour:
   - id: K1
     texto: "Esta \xE9 a copa. Muita parceria come\xE7a numa conversa durante o caf\xE9."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: e00412b5741249d4faffa5506c413770, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: K2
@@ -124,7 +124,7 @@ MonoBehaviour:
   - id: K2
     texto: "Nas mesas ao lado acontecem reuni\xF5es r\xE1pidas e mentorias."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 9afb6d54651649c43a89b7666e50e584, type: 3}
     opcoes:
     - rotulo: Quero saber mais
       proximaFala: K2
@@ -136,7 +136,7 @@ MonoBehaviour:
     texto: "Chegamos \xE0 sala dos fundos. Puxe a ma\xE7aneta para abrir a porta
       de vidro."
     dica: "Aponte para a ma\xE7aneta e aperte o bot\xE3o lateral."
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 074dd70b4486db945bc4e3e7901cc36f, type: 3}
     opcoes: []
   - id: F2
     texto: "Esta sala \xE9 usada para [fun\xE7\xE3o a confirmar com o material do
@@ -151,7 +151,7 @@ MonoBehaviour:
     texto: "Voc\xEA conheceu os cinco espa\xE7os. Volte para a recep\xE7\xE3o para
       encerrar a visita."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: bc99a9a636140d948b766bea704d2dcb, type: 3}
     opcoes:
     - rotulo: Voltar
       proximaFala: 
@@ -159,7 +159,7 @@ MonoBehaviour:
   - id: E1
     texto: "Obrigado pela visita! Voc\xEA conheceu 5 de 5 espa\xE7os do Sebraelab."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 71ee90883506d1145b9f420dcdda0580, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: E2
@@ -167,7 +167,7 @@ MonoBehaviour:
   - id: E2
     texto: "Para conhecer o espa\xE7o pessoalmente, procure o Sebrae no Maranh\xE3o."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: eb527c749d28f944aa4a1331d9f3b14f, type: 3}
     opcoes:
     - rotulo: "Recome\xE7ar"
       proximaFala: 
@@ -179,10 +179,10 @@ MonoBehaviour:
     texto: "Teleporte para o c\xEDrculo com a placa Pr\xF3xima parada. Te espero
       l\xE1!"
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 5953de269457a5f488753214b77af620, type: 3}
     opcoes: []
   - id: FIM
     texto: "At\xE9 a pr\xF3xima!"
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: ee24d92949a0c5946b2984f0ede03d1f, type: 3}
     opcoes: []
