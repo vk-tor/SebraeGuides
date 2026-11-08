@@ -7,8 +7,8 @@ using UnityEngine.UI;
 namespace SebraeGuides
 {
     /// <summary>
-    /// Balão de fala do guia. Mostra o texto de cada fala do roteiro, toca o áudio
-    /// e cria um botão para cada opção. Botões com evento avisam o ControleVisita.
+    /// Balão de fala do guia. Mostra o texto de cada fala do roteiro, toca o áudio,
+    /// aciona os gestos do Professor Otávio (GuiaNPC) e cria um botão para cada opção.
     /// </summary>
     public class DialogoGuia : MonoBehaviour
     {
@@ -24,9 +24,10 @@ namespace SebraeGuides
         public RectTransform areaBotoes;
         public Button modeloBotao;
 
-        [Header("Áudio")]
+        [Header("Áudio e Guia 3D")]
         public AudioSource voz;
         public AudioClip somClique;
+        public GuiaNPC guia;
 
         /// <summary>Disparado quando o visitante aperta um botão que tem evento.</summary>
         public event Action<string> AoEvento;
@@ -38,6 +39,7 @@ namespace SebraeGuides
 
         void Awake()
         {
+            if (!guia) guia = GetComponent<GuiaNPC>();
             if (modeloBotao) modeloBotao.gameObject.SetActive(false);
             if (roteiro && textoNome) textoNome.text = roteiro.nomeDoGuia;
             if (balao)
@@ -94,6 +96,16 @@ namespace SebraeGuides
                     voz.clip = fala.audio;
                     voz.Play();
                 }
+            }
+
+            if (guia)
+            {
+                if (fala.id == "R1" || fala.id == "E1" || fala.id == "FIM")
+                {
+                    guia.Acenar(2.8f);
+                }
+                float duracaoFala = fala.audio ? fala.audio.length : Mathf.Clamp(fala.texto.Length * 0.055f, 2.5f, 7.0f);
+                guia.IndicarFala(duracaoFala);
             }
         }
 
