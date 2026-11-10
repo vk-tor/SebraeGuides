@@ -118,12 +118,12 @@ namespace SebraeGuides
             AoFechar?.Invoke();
         }
 
-        // Só dentro do Unity: completa a dica com a tecla do XR Device Simulator.
-        // No Quest (APK) a dica aparece como está no roteiro.
+        // Só dentro do Unity e sem óculos: completa a dica com a tecla do XR Device Simulator.
+        // Com o Quest (Link ou APK) a dica aparece como está no roteiro.
         static string DicaComTecla(string dica)
         {
 #if UNITY_EDITOR
-            if (!string.IsNullOrEmpty(dica))
+            if (!string.IsNullOrEmpty(dica) && !UnityEngine.XR.XRSettings.isDeviceActive)
             {
                 string texto = dica.ToLowerInvariant();
                 string acao = null;

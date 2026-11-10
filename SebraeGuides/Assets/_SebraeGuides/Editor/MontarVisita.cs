@@ -56,6 +56,16 @@ namespace SebraeGuides.Ferramentas
         static readonly string[] RaizesParaDesligar =
             { "Environment", "Interactables", "UI", "Teleport Area Setup", "UI Sample", "Cube", "posicoes_npc" };
 
+        // O simulador tira o headset de verdade do Input System: salvo na cena, quebra o rastreamento da cabeça
+        // no Quest (Link e APK). Sem óculos ele aparece sozinho no Play (Project Settings > XR Plug-in Management >
+        // XR Interaction Toolkit > Use XR Device Simulator in scenes), então não precisa ficar na cena.
+        static readonly string[] TiposDeSimulador = { "XRDeviceSimulator", "XRInteractionSimulator" };
+
+        // Partes do modelo que se mexem na visita e não podem ser Static.
+        static readonly string[] PartesMoveis = { "Backroom GlassDoor" };
+
+        const string PastaLuzVisita = "Assets/Scenes/Visita";
+
         // ------------------------------------------------------------------ dados das paradas
         struct DadosParada
         {
@@ -129,11 +139,11 @@ namespace SebraeGuides.Ferramentas
         {
             if (!EditorUtility.DisplayDialog("Sebrae Guides - Montar a visita",
                     "Isto vai:\n\n" +
-                    "• ligar os colisores do modelo do Sebraelab;\n" +
-                    "• criar (ou atualizar) a cena Assets/Scenes/Visita.unity, copiada da SampleScene;\n" +
-                    "• montar o guia (Professor Otávio, com animações), os 5 pontos de interesse, o teleporte e as 5 interações.\n\n" +
-                    "A SampleScene não é alterada. Rodar de novo apaga e refaz a montagem " +
-                    "(ajustes feitos à mão nos objetos gerados se perdem; o roteiro é mantido).",
+                    "• ligar os colisores do Sebraelab e marcá-lo como Static;\n" +
+                    "• criar (ou atualizar) a cena Visita, com luz própria;\n" +
+                    "• montar o guia, os 5 pontos de interesse, o teleporte e as 5 interações;\n" +
+                    "• tirar o XR Device Simulator da cena (sem óculos ele aparece sozinho no Play).\n\n" +
+                    "Rodar de novo refaz a montagem: ajustes à mão nos objetos gerados se perdem, o roteiro fica.",
                     "Montar", "Cancelar"))
                 return;
 
@@ -161,6 +171,7 @@ namespace SebraeGuides.Ferramentas
                 var antiga = BuscarRaiz(cena, NomeRaiz);
                 if (antiga) Object.DestroyImmediate(antiga);
                 DesligarSobras(cena);
+                RemoverSimuladores(cena);
 
                 var modelo = BuscarRaiz(cena, NomeModeloNaCena);
                 if (!modelo)
@@ -169,6 +180,10 @@ namespace SebraeGuides.Ferramentas
                         "Não encontrei o objeto 'Sebrae Lab' na raiz da cena. Confira se o modelo está na SampleScene.", "OK");
                     return;
                 }
+
+                // Antes de Construir: a porta de vidro (criada lá) volta a não ser Static.
+                MarcarModeloComoEstatico(modelo.transform);
+                AjustarLuzDaCena(cena, modelo.transform);
 
                 EditorUtility.DisplayProgressBar("Sebrae Guides", "Montando guia, pontos e interações...", 0.6f);
                 var raiz = new GameObject(NomeRaiz);
@@ -180,6 +195,7 @@ namespace SebraeGuides.Ferramentas
 
                 EditorSceneManager.MarkSceneDirty(cena);
                 EditorSceneManager.SaveScene(cena);
+                GerarLuzSeNecessario(cena);
                 Selection.activeGameObject = controle.gameObject;
                 EditorGUIUtility.PingObject(controle.gameObject);
             }
@@ -210,11 +226,31 @@ namespace SebraeGuides.Ferramentas
         [MenuItem("Sebrae Guides/3. Ajustar o nome do app no Quest", false, 3)]
         static void AjustarApp()
         {
+            AplicarNomeDoApp();
+            EditorUtility.DisplayDialog("Sebrae Guides",
+                "Nome do app: Sebraelab 360\nPacote Android: com.SebraeGuides.Sebraelab360", "OK");
+        }
+
+        // Sem isto o APK sai como com.DefaultCompany.VRTemplate, e outro projeto do template no mesmo óculos substitui o nosso.
+        internal static void AplicarNomeDoApp()
+        {
             PlayerSettings.companyName = "Sebrae Guides";
             PlayerSettings.productName = "Sebraelab 360";
             PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android, "com.SebraeGuides.Sebraelab360");
-            EditorUtility.DisplayDialog("Sebrae Guides",
-                "Nome do app: Sebraelab 360\nPacote Android: com.SebraeGuides.Sebraelab360", "OK");
+        }
+
+        [MenuItem("Sebrae Guides/Refazer a luz da Visita (bake)", false, 22)]
+        static void RefazerLuz()
+        {
+            var cena = SceneManager.GetActiveScene();
+            if (cena.path != CenaVisita)
+            {
+                EditorUtility.DisplayDialog("Sebrae Guides", "Abra a cena Visita primeiro (item 2 do menu).", "OK");
+                return;
+            }
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            try { GerarLuz(cena); }
+            finally { EditorUtility.ClearProgressBar(); }
         }
 
         [MenuItem("Sebrae Guides/Editar as falas do guia", false, 20)]
@@ -498,6 +534,156 @@ namespace SebraeGuides.Ferramentas
             Debug.Log($"[Sebrae Guides] Desligados na raiz: {string.Join(", ", desligados)}. Sobras do Blender desligadas no modelo: {sobras}.");
         }
 
+        static void RemoverSimuladores(Scene cena)
+        {
+            var removidos = new List<string>();
+            foreach (var objeto in cena.GetRootGameObjects())
+            {
+                foreach (var componente in objeto.GetComponentsInChildren<MonoBehaviour>(true))
+                {
+                    if (!componente || System.Array.IndexOf(TiposDeSimulador, componente.GetType().Name) < 0) continue;
+                    var alvo = componente.gameObject;
+                    removidos.Add(alvo.name);
+                    if (alvo.transform.parent == null)
+                    {
+                        Object.DestroyImmediate(alvo); // objeto da raiz (o caso do projeto): apaga inteiro
+                        break;
+                    }
+                    alvo.SetActive(false); // dentro de outro objeto: só desliga
+                }
+            }
+
+            if (removidos.Count > 0)
+                Debug.Log($"[Sebrae Guides] Simulador tirado da cena: {string.Join(", ", removidos)}. Sem óculos, ele aparece sozinho no Play.");
+        }
+
+        // Static no Sebraelab: o Unity junta as malhas fixas (menos chamadas de desenho no Quest) e a sonda de reflexo
+        // passa a enxergar o interior. Sem "Contribute GI": o bake não gera lightmaps (o modelo não tem UV de lightmap).
+        static void MarcarModeloComoEstatico(Transform modelo)
+        {
+            const StaticEditorFlags estatico = StaticEditorFlags.BatchingStatic | StaticEditorFlags.ReflectionProbeStatic;
+            int marcados = 0;
+            MarcarEstatico(modelo, estatico, ref marcados);
+            Debug.Log($"[Sebrae Guides] Sebraelab marcado como Static (Batching e Reflection Probe): {marcados} objeto(s) alterado(s). Porta de vidro fica móvel.");
+        }
+
+        static void MarcarEstatico(Transform objeto, StaticEditorFlags estatico, ref int marcados)
+        {
+            bool movel = System.Array.IndexOf(PartesMoveis, objeto.name.Trim()) >= 0;
+            if (movel)
+            {
+                foreach (var parte in objeto.GetComponentsInChildren<Transform>(true))
+                    GameObjectUtility.SetStaticEditorFlags(parte.gameObject, 0);
+                return;
+            }
+
+            if (GameObjectUtility.GetStaticEditorFlags(objeto.gameObject) != estatico)
+            {
+                GameObjectUtility.SetStaticEditorFlags(objeto.gameObject, estatico);
+                marcados++;
+            }
+            foreach (Transform filho in objeto) MarcarEstatico(filho, estatico, ref marcados);
+        }
+
+        // A Visita nasceu da SampleScene e herdou a luz pré-calculada de lá: as sondas de luz e de reflexo ficam na sala
+        // do template, a uns 85 m do Sebraelab, e eram elas que iluminavam o guia, as mãos e o crachá.
+        // Aqui: sondas de luz desligadas (sem bake de GI, o guia usa a luz ambiente do céu, como o resto da cena),
+        // sonda de reflexo levada para dentro do Sebraelab e o sol sem sombra. A sombra do teto só era calculada perto
+        // do visitante (2,5 m no Quest, 10 m no PC) e fazia um círculo escuro em volta de quem está de óculos.
+        static void AjustarLuzDaCena(Scene cena, Transform modelo)
+        {
+            const string NomeSondaReflexo = "Reflection Probe (Sebraelab)";
+            var limites = LimitesVisiveis(modelo);
+            var sondas = new List<ReflectionProbe>();
+            int sondasLuz = 0, sois = 0;
+
+            foreach (var raiz in cena.GetRootGameObjects())
+            {
+                if (raiz.name == NomeRaiz || !raiz.activeSelf) continue;
+
+                foreach (var grupo in raiz.GetComponentsInChildren<LightProbeGroup>(true))
+                {
+                    if (!grupo.gameObject.activeInHierarchy || !grupo.enabled) continue;
+                    if (grupo.GetComponents<Component>().Length == 2) grupo.gameObject.SetActive(false);
+                    else grupo.enabled = false;
+                    sondasLuz++;
+                }
+
+                sondas.AddRange(raiz.GetComponentsInChildren<ReflectionProbe>(true));
+
+                foreach (var luz in raiz.GetComponentsInChildren<Light>(true))
+                {
+                    if (luz.type != LightType.Directional || luz.shadows == LightShadows.None) continue;
+                    luz.shadows = LightShadows.None;
+                    EditorUtility.SetDirty(luz);
+                    sois++;
+                }
+            }
+
+            var principal = sondas.Find(s => s.name == NomeSondaReflexo) ??
+                            sondas.Find(s => s.gameObject.activeInHierarchy) ??
+                            (sondas.Count > 0 ? sondas[0] : null);
+            foreach (var sonda in sondas)
+            {
+                if (sonda != principal)
+                {
+                    if (sonda.gameObject.activeSelf && sonda.GetComponents<Component>().Length == 2) sonda.gameObject.SetActive(false);
+                    else sonda.enabled = false;
+                    continue;
+                }
+                if (limites.size == Vector3.zero) continue;
+                sonda.gameObject.SetActive(true);
+                sonda.enabled = true;
+                sonda.mode = UnityEngine.Rendering.ReflectionProbeMode.Baked;
+                sonda.boxProjection = false;
+                sonda.transform.position = new Vector3(limites.center.x, Piso + 1.6f, limites.center.z);
+                sonda.size = limites.size + Vector3.one;
+                sonda.center = limites.center - sonda.transform.position;
+                sonda.name = NomeSondaReflexo;
+                EditorUtility.SetDirty(sonda);
+            }
+
+            Debug.Log($"[Sebrae Guides] Luz da cena: {sondasLuz} grupo(s) de sondas de luz do template desligado(s); " +
+                      (principal ? $"sonda de reflexo levada para o Sebraelab ({limites.size.x:0} x {limites.size.z:0} m); " : "nenhuma sonda de reflexo; ") +
+                      $"sombra do sol desligada em {sois} luz(es).");
+        }
+
+        static Bounds LimitesVisiveis(Transform raiz)
+        {
+            bool achou = false;
+            var limites = new Bounds();
+            foreach (var renderer in raiz.GetComponentsInChildren<Renderer>(false))
+            {
+                if (!renderer.enabled) continue;
+                if (!achou) { limites = renderer.bounds; achou = true; }
+                else limites.Encapsulate(renderer.bounds);
+            }
+            return limites;
+        }
+
+        // Na primeira montagem (ou se a cena ainda usa a luz da SampleScene), calcula a luz da própria Visita.
+        // Sem objetos com "Contribute GI", o bake é rápido: só a luz ambiente do céu e a sonda de reflexo.
+        static void GerarLuzSeNecessario(Scene cena)
+        {
+            var dados = Lightmapping.lightingDataAsset;
+            string caminho = dados ? AssetDatabase.GetAssetPath(dados) : string.Empty;
+            if (caminho.StartsWith(PastaLuzVisita + "/")) return;
+            GerarLuz(cena);
+        }
+
+        static void GerarLuz(Scene cena)
+        {
+            EditorUtility.DisplayProgressBar("Sebrae Guides", "Calculando a luz da Visita (bake)...", 0.95f);
+            bool terminou = Lightmapping.Bake();
+            EditorSceneManager.MarkSceneDirty(cena);
+            EditorSceneManager.SaveScene(cena);
+            var dados = Lightmapping.lightingDataAsset;
+            if (terminou && dados)
+                Debug.Log($"[Sebrae Guides] Luz da Visita calculada: {AssetDatabase.GetAssetPath(dados)}.");
+            else
+                Debug.LogWarning("[Sebrae Guides] O cálculo da luz não terminou. Use Window > Rendering > Lighting > Generate Lighting com a cena Visita aberta.");
+        }
+
         const string PastaFalas = Pasta + "/Audio/Falas";
 
         // Vozes: cada arquivo Audio/Falas/<ID>.ogg (ou .mp3 / .wav) é ligado à fala de mesmo ID no roteiro.
@@ -684,6 +870,7 @@ namespace SebraeGuides.Ferramentas
 
             CriarAreaLivre(modelo, primeiraAncora);
             CriarLuzes(raiz);
+            CriarCameraDoProjetor(raiz);
 
             EditorUtility.SetDirty(controle);
             Debug.Log("[Sebrae Guides] Visita montada: guia, 5 POIs, 6 pontos de teleporte, crachá, TV, post-it, mural e porta.");
@@ -1087,7 +1274,8 @@ namespace SebraeGuides.Ferramentas
             var vidro = BuscarNoModelo(modelo, "Backroom GlassDoor");
             if (vidro)
             {
-                GameObjectUtility.SetStaticEditorFlags(vidro.gameObject, 0);
+                foreach (var parte in vidro.GetComponentsInChildren<Transform>(true))
+                    GameObjectUtility.SetStaticEditorFlags(parte.gameObject, 0);
                 porta.partes = new[] { vidro, macaneta };
             }
             else
@@ -1141,6 +1329,19 @@ namespace SebraeGuides.Ferramentas
                 luz.shadows = LightShadows.None;
                 luz.lightmapBakeType = LightmapBakeType.Realtime;
             }
+        }
+
+        // Câmera estável para o projetor: só liga com o óculos no Link (no simulador e no APK fica desligada).
+        // Com a janela Game em foco: F1 primeira pessoa suave, F2 terceira pessoa, F3 esta posição fixa, F4 liga/desliga.
+        static void CriarCameraDoProjetor(Transform raiz)
+        {
+            var objeto = Filho(raiz, "Camera do projetor (so com oculos no Link)");
+            objeto.position = new Vector3(-60.05f, 2.0f, -59.95f); // atrás da recepção (A0)
+            objeto.rotation = Quaternion.LookRotation(new Vector3(-58.9f, 1.3f, -63.6f) - objeto.position);
+            var camera = objeto.gameObject.AddComponent<Camera>();
+            camera.nearClipPlane = 0.05f;
+            camera.enabled = false; // a CameraEspectador liga quando há óculos
+            objeto.gameObject.AddComponent<SebraeGuides.Apresentacao.CameraEspectador>();
         }
 
         // ------------------------------------------------------------------ utilitários
