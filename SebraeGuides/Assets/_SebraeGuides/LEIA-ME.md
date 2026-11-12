@@ -42,6 +42,7 @@ Controles no Quest:
 | Virar | Analógico para os lados |
 | Apertar botão de painel | Apontar e apertar o gatilho |
 | Pegar crachá / post-it / maçaneta | Apontar e segurar o botão lateral (grip) |
+| Colar o post-it | Apontar para "Colar aqui" no mural e apertar o gatilho (ou levar o post-it com a mão) |
 
 ## 4. Roteiro da visita
 
@@ -49,7 +50,7 @@ Controles no Quest:
 |---|---|
 | A0 Recepção | Pegar o crachá de pé no suporte do balcão (ele cresce quando o raio aponta e some quando é solto) |
 | A1 Arena | Botão "Ligar a TV" no painel |
-| A2 Coworking | Levar o post-it da estante até o mural |
+| A2 Coworking | Escolher uma das 3 ideias no balão do guia (ela aparece escrita no post-it, no canto do mural) e colar: apontar para "Colar aqui" e apertar o gatilho, ou, de óculos, pegar o post-it e soltar no quadro. As ideias ficam na fala C3 do roteiro (evento `ideia:texto do post-it`) |
 | A3 Copa | (só conversa) |
 | A4 Sala dos fundos | Puxar a maçaneta da porta de vidro |
 | Volta à recepção | Encerramento, com "Recomeçar" ou "Encerrar" |
@@ -59,7 +60,7 @@ Controles no Quest:
 | Quero mudar... | Onde |
 |---|---|
 | Texto das falas e botões | Menu Sebrae Guides > Editar as falas do guia (arquivo `Dados/RoteiroGuia.asset`) |
-| Áudio de uma fala | Pasta `Audio/Falas`: um arquivo por fala com o ID no nome (`R1.ogg`, `A1.ogg`...). Para trocar, substitua o arquivo e rode o item 1 do menu, que liga cada áudio à sua fala. Vozes atuais: ElevenLabs, voz "Moutella", plano gratuito (crédito obrigatório: "Vozes geradas com ElevenLabs (elevenlabs.io)"). Falta a F2 |
+| Áudio de uma fala | Pasta `Audio/Falas`: um arquivo por fala com o ID no nome (`R1.ogg`, `A1.ogg`...). Para trocar, substitua o arquivo e rode o item 1 do menu, que liga cada áudio à sua fala. Vozes atuais: ElevenLabs, voz "Moutella", plano gratuito (crédito obrigatório: "Vozes geradas com ElevenLabs (elevenlabs.io)"). Todas as 22 falas têm voz |
 | Título e texto de um painel | Hierarchy > Sebraelab360 (gerado) > Pontos de interesse > POI ... (componente Ponto De Interesse) |
 | Fotos da TV | Pasta `Fotos`: as imagens entram em ordem de nome (TV_01, TV_02...) e as legendas ficam em `Fotos/legendas.txt` ("legenda \| crédito", uma linha por foto). Depois de trocar, rode o item 1 do menu. Fotos atuais: Google Maps (contribuições de visitantes) |
 | Modelo do guia | O guia é o Professor Otávio (`Modelos/ProfessorOtavio_Guia.fbx`, 42 mil triângulos, 4 animações). Para trocar, substitua esse FBX por outro com o mesmo nome e rode o item 1 do menu. Não coloque XR Interactable nem colisor no guia: ele rouba o raio dos botões do balão |
@@ -69,7 +70,7 @@ Controles no Quest:
 | Luz calculada (bake) | Pasta `Scenes/Visita`. Para refazer: Sebrae Guides > Refazer a luz da Visita (bake) |
 | Câmera do projetor | Hierarchy > Sebraelab360 (gerado) > Camera do projetor. Só liga com o óculos no Link |
 
-Textos entre [colchetes] precisam ser completados com o material do professor.
+Os textos das falas e dos painéis são os finais da equipe (os da branch `edge-tts`, de nov/2026), com a C3/C3B do post-it. Ao rodar o item 1, o roteiro recebe esses textos, mas uma fala editada à mão no RoteiroGuia não é trocada.
 
 Atenção: se você rodar o item 1 do menu de novo, ajustes feitos à mão dentro de "Sebraelab360 (gerado)" se perdem. As falas (RoteiroGuia.asset) ficam.
 
@@ -95,7 +96,8 @@ Atenção: se você rodar o item 1 do menu de novo, ajustes feitos à mão dentr
 | GatilhoInteracao | Avisa a visita quando algo é pego, apertado ou encaixado |
 | TelaTV | TV da arena com fotos e legendas |
 | PortaDeslizante | Abre a porta de vidro da sala dos fundos |
-| SocketMuralIdeias + PostIt | Mural que só aceita o post-it |
+| MuralDeIdeias | Escreve no post-it a ideia escolhida, mostra o botão "Colar aqui" e cola o post-it no mural |
+| SocketMuralIdeias + PostIt | Mural que só aceita o post-it já escrito; o PostIt mostra o texto da ideia |
 | MarcadorProximaParada | Placa "Próxima parada" sobre o próximo teleporte |
 | ViradoParaCamera | Mantém painéis virados para o visitante |
 | SimuladorSoSemOculos | Com o óculos conectado, não deixa o XR Device Simulator ser criado (ele quebraria o rastreamento da cabeça) |

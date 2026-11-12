@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a3ea6aedddf6844870ef4415e97568, type: 3}
   m_Name: RoteiroGuia
   m_EditorClassIdentifier: 
-  nomeDoGuia: Guia
+  nomeDoGuia: "Prof. Ot\xE1vio"
   falas:
   - id: R1
-    texto: "Ol\xE1! Bem-vindo ao Sebraelab. Eu sou o guia e vou te acompanhar nesta
-      visita."
+    texto: "Ol\xE1! Bem-vindo ao Sebraelab. Eu sou o Professor Ot\xE1vio e vou te
+      acompanhar nesta visita guiada."
     dica: 
     audio: {fileID: 8300000, guid: 9d4e56947e072fa479277775ace1ca2a, type: 3}
     opcoes:
@@ -56,8 +56,8 @@ MonoBehaviour:
       proximaFala: 
       evento: ir_arena
   - id: A1
-    texto: "Esta \xE9 a arena. Aqui acontecem palestras, oficinas e apresenta\xE7\xF5es
-      de projetos."
+    texto: "Esta \xE9 a arena de eventos. Aqui acontecem palestras, oficinas pr\xE1ticas,
+      maratonas de inova\xE7\xE3o e apresenta\xE7\xF5es de projetos."
     dica: 
     audio: {fileID: 8300000, guid: e963ee55b3af67045aab17bfc65ca56a, type: 3}
     opcoes:
@@ -71,7 +71,7 @@ MonoBehaviour:
     audio: {fileID: 8300000, guid: 2411d9729927ead47acf040734be2778, type: 3}
     opcoes: []
   - id: A3
-    texto: Agora vamos para o coworking.
+    texto: "Agora vamos conhecer o espa\xE7o de coworking."
     dica: 
     audio: {fileID: 8300000, guid: 0a125c1b7c1ce554a983b763379c1300, type: 3}
     opcoes:
@@ -100,13 +100,28 @@ MonoBehaviour:
       proximaFala: C3
       evento: 
   - id: C3
-    texto: "Pegue um post-it na estante da parede e cole no quadro \xE0 sua frente
-      para deixar a sua ideia no mural."
-    dica: "Pegue o post-it amarelo com o bot\xE3o lateral e solte em cima do quadro."
+    texto: "Toda ideia come\xE7a no papel. Qual destas ideias voc\xEA quer escrever
+      no seu post-it?"
+    dica: 
     audio: {fileID: 8300000, guid: 0f99eca5c0c0b6a47a1e1ff80b9403e6, type: 3}
+    opcoes:
+    - rotulo: App de turismo
+      proximaFala: C3B
+      evento: "ideia:Um app de turismo para S\xE3o Lu\xEDs"
+    - rotulo: Feira online
+      proximaFala: C3B
+      evento: ideia:Uma feira online para produtores locais
+    - rotulo: Curso para jovens
+      proximaFala: C3B
+      evento: "ideia:Um curso de programa\xE7\xE3o para jovens"
+  - id: C3B
+    texto: "\xD3timo, sua ideia j\xE1 est\xE1 no post-it. Agora \xE9 s\xF3 colar:
+      aponte para o mural e aperte o gatilho."
+    dica: Aponte para "Colar aqui", no mural, e aperte o gatilho.
+    audio: {fileID: 8300000, guid: abe2c90a4e45e5649897e92096c8cdc5, type: 3}
     opcoes: []
   - id: C4
-    texto: "Ideia registrada! Vamos at\xE9 a copa."
+    texto: "Ideia registrada com sucesso! Vamos at\xE9 a copa e \xE1rea de conviv\xEAncia."
     dica: 
     audio: {fileID: 8300000, guid: 7e7208fc2a00fb445a4fcbd1922a3b52, type: 3}
     opcoes:
@@ -114,7 +129,8 @@ MonoBehaviour:
       proximaFala: 
       evento: ir_copa
   - id: K1
-    texto: "Esta \xE9 a copa. Muita parceria come\xE7a numa conversa durante o caf\xE9."
+    texto: "Esta \xE9 a copa. Muita parceria importante come\xE7a numa conversa informal
+      durante o caf\xE9."
     dica: 
     audio: {fileID: 8300000, guid: e00412b5741249d4faffa5506c413770, type: 3}
     opcoes:
@@ -122,7 +138,8 @@ MonoBehaviour:
       proximaFala: K2
       evento: 
   - id: K2
-    texto: "Nas mesas ao lado acontecem reuni\xF5es r\xE1pidas e mentorias."
+    texto: "Nas mesas ao lado acontecem reuni\xF5es r\xE1pidas, conex\xF5es e mentorias
+      para novos neg\xF3cios."
     dica: 
     audio: {fileID: 8300000, guid: 9afb6d54651649c43a89b7666e50e584, type: 3}
     opcoes:
@@ -139,17 +156,17 @@ MonoBehaviour:
     audio: {fileID: 8300000, guid: 074dd70b4486db945bc4e3e7901cc36f, type: 3}
     opcoes: []
   - id: F2
-    texto: "Esta sala \xE9 usada para [fun\xE7\xE3o a confirmar com o material do
-      professor]."
+    texto: "Esta sala reservada \xE9 usada para reuni\xF5es estrat\xE9gicas, oficinas
+      focadas e atendimento especializado a empreendedores."
     dica: 
-    audio: {fileID: 0}
+    audio: {fileID: 8300000, guid: 87cff84396560a641916d31023f828ae, type: 3}
     opcoes:
     - rotulo: Continuar
       proximaFala: F3
       evento: 
   - id: F3
-    texto: "Voc\xEA conheceu os cinco espa\xE7os. Volte para a recep\xE7\xE3o para
-      encerrar a visita."
+    texto: "Excelente! Voc\xEA conheceu os cinco espa\xE7os. Volte para a recep\xE7\xE3o
+      para encerrar a visita."
     dica: 
     audio: {fileID: 8300000, guid: bc99a9a636140d948b766bea704d2dcb, type: 3}
     opcoes:
@@ -182,7 +199,7 @@ MonoBehaviour:
     audio: {fileID: 8300000, guid: 5953de269457a5f488753214b77af620, type: 3}
     opcoes: []
   - id: FIM
-    texto: "At\xE9 a pr\xF3xima!"
+    texto: "At\xE9 a pr\xF3xima visita! Foi um prazer te receber no Sebraelab!"
     dica: 
     audio: {fileID: 8300000, guid: ee24d92949a0c5946b2984f0ede03d1f, type: 3}
     opcoes: []

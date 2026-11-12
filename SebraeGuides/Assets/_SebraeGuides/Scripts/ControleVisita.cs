@@ -141,6 +141,9 @@ namespace SebraeGuides
             if (string.IsNullOrEmpty(evento)) return;
             Debug.Log($"[Visita] Evento recebido: {evento}");
 
+            // A ideia escolhida para o post-it é tratada pelo MuralDeIdeias; a parada só conclui quando ele é colado.
+            if (evento.StartsWith(MuralDeIdeias.PrefixoIdeia)) return;
+
             if (evento.StartsWith("ir_"))
             {
                 string chave = evento.Substring(3);

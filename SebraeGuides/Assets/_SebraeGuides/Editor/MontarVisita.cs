@@ -87,7 +87,7 @@ namespace SebraeGuides.Ferramentas
                 {
                     codigo = "A0", chave = "recepcao", titulo = "Bem-vindo ao Sebraelab",
                     resumo = "O hub de inovação aberta do Sebrae, para conectar empreendedores, startups, universidades e parceiros.",
-                    detalhes = "Nesta visita você passa pela arena de eventos, pelo coworking, pela copa e pela sala dos fundos.",
+                    detalhes = "Nesta visita guiada pelo Prof. Otávio você passa pela arena de eventos, pelo coworking, pela copa e pela sala dos fundos.",
                     falaAoChegar = "", evento = "pegou_cracha", falaAoConcluir = "R5",
                     ancora = new Vector2(-59.8f, -60.7f), yawAncora = 162.8f,
                     guia = new Vector2(-58.9f, -63.6f), painel = new Vector2(-60.58f, -62.54f), raio = 2f
@@ -95,8 +95,8 @@ namespace SebraeGuides.Ferramentas
                 new DadosParada
                 {
                     codigo = "A1", chave = "arena", titulo = "Arena de eventos",
-                    resumo = "Espaço para palestras, oficinas e apresentações de projetos.",
-                    detalhes = "[Completar com o material do professor: tipos de evento e capacidade.]",
+                    resumo = "Espaço aberto com arquibancada para palestras, oficinas práticas, maratonas de inovação e apresentações de projetos.",
+                    detalhes = "A Arena do Sebraelab recebe demodays, hackathons, painéis com especialistas e encontros gratuitos que conectam empreendedores e estudantes.",
                     falaAoChegar = "A1", evento = "tv_ligada", falaAoConcluir = "A3", rotuloBotao = "Ligar a TV",
                     ancora = new Vector2(-65.6f, -59.8f), yawAncora = -5f,
                     guia = new Vector2(-64.1f, -58.0f), painel = new Vector2(-65.77f, -57.81f), raio = 2.5f
@@ -105,7 +105,7 @@ namespace SebraeGuides.Ferramentas
                 {
                     codigo = "A2", chave = "coworking", titulo = "Coworking",
                     resumo = "Estações compartilhadas para trabalhar, trocar ideias e fazer contatos.",
-                    detalhes = "As etapas do design thinking: imersão, ideação, prototipação e implementação (Sebrae, 2015).",
+                    detalhes = "As etapas do design thinking aplicadas na prática: imersão, ideação, prototipação e implementação (Sebrae, 2015).",
                     falaAoChegar = "C1", evento = "postit_colado", falaAoConcluir = "C4",
                     ancora = new Vector2(-68.2f, -65.6f), yawAncora = 180f,
                     guia = new Vector2(-69.7f, -66.0f), painel = new Vector2(-66.72f, -67.08f), raio = 2f,
@@ -114,8 +114,8 @@ namespace SebraeGuides.Ferramentas
                 new DadosParada
                 {
                     codigo = "A3", chave = "copa", titulo = "Copa e convivência",
-                    resumo = "Um espaço para pausas, conversas e reuniões rápidas.",
-                    detalhes = "[Completar com o material do professor: mentorias e encontros que acontecem aqui.]",
+                    resumo = "Um espaço acolhedor para pausas, conversas informais, conexões e reuniões rápidas.",
+                    detalhes = "Na área de convivência e nas mesas laterais acontecem mentorias rápidas, trocas de experiências e conexões que geram novas parcerias.",
                     falaAoChegar = "K1", evento = "", falaAoConcluir = "",
                     ancora = new Vector2(-64.7f, -69.2f), yawAncora = -70f,
                     guia = new Vector2(-66.4f, -70.2f), painel = new Vector2(-66.58f, -68.52f), raio = 2f
@@ -123,8 +123,8 @@ namespace SebraeGuides.Ferramentas
                 new DadosParada
                 {
                     codigo = "A4", chave = "fundos", titulo = "Sala dos fundos",
-                    resumo = "[Função da sala a confirmar com o material do professor.]",
-                    detalhes = "",
+                    resumo = "Sala reservada para reuniões estratégicas, oficinas focadas e atendimento especializado a empreendedores.",
+                    detalhes = "Um ambiente tranquilo nos fundos do Sebraelab, ideal para validação de modelos de negócio e mentorias em pequenos grupos.",
                     falaAoChegar = "F1", evento = "porta_aberta", falaAoConcluir = "F2",
                     ancora = new Vector2(-62.9f, -75.3f), yawAncora = 175f,
                     guia = new Vector2(-64.05f, -76.4f), painel = new Vector2(-61.6f, -76.2f), raio = 2f,
@@ -165,6 +165,17 @@ namespace SebraeGuides.Ferramentas
                 GarantirPasta(PastaDados);
                 GarantirPasta(PastaMateriais);
                 var roteiro = CarregarOuCriarRoteiro(false);
+                bool postItNovo = RoteiroPadrao.AtualizarFalasDoPostIt(roteiro);
+                bool textosNovos = RoteiroPadrao.AtualizarTextosFinais(roteiro);
+                if (postItNovo || textosNovos)
+                {
+                    EditorUtility.SetDirty(roteiro);
+                    AssetDatabase.SaveAssets();
+                    Debug.Log("[Sebrae Guides] Roteiro atualizado:" +
+                              (postItNovo ? " falas do post-it (C3 com 3 ideias e C3B nova);" : "") +
+                              (textosNovos ? " textos finais da equipe (R1, A1, A3, C4, K1, K2, F2, F3, FIM e nome do guia);" : "") +
+                              " falas editadas à mão não mudam.");
+                }
                 VincularAudiosDasFalas(roteiro);
 
                 EditorUtility.DisplayProgressBar("Sebrae Guides", "Desligando objetos do template...", 0.45f);
@@ -856,10 +867,21 @@ namespace SebraeGuides.Ferramentas
             var tv = CriarTV(grupoInteracoes, clique);
             if (botaoTV) UnityEventTools.AddPersistentListener(botaoTV.onClick, tv.Ligar);
 
-            // I4 - post-it na estante e mural no quadro do coworking
-            var postIt = CriarPostIt(grupoInteracoes);
-            CriarMural(grupoInteracoes, clique);
-            Parada(controle, "coworking").ativarAoChegar.Add(postIt);
+            // I4 - mural de ideias no quadro do coworking e post-it em branco no canto dele.
+            // A ideia vem dos botões da fala C3; colar = "Colar aqui" + gatilho ou, de óculos, levar com a mão.
+            var mural = CriarMural(grupoInteracoes);
+            var postIt = CriarPostIt(grupoInteracoes, mural);
+            var muralDeIdeias = mural.gameObject.AddComponent<MuralDeIdeias>();
+            muralDeIdeias.dialogo = controle.dialogo;
+            muralDeIdeias.postIt = postIt;
+            muralDeIdeias.encaixe = mural.Find(NomeEncaixePostIt);
+            muralDeIdeias.botaoColar = mural.GetComponentInChildren<Button>(true);
+            muralDeIdeias.somColar = clique;
+            var gatilhoMural = mural.gameObject.AddComponent<GatilhoInteracao>(); // colar com a mão (socket)
+            gatilhoMural.evento = "postit_colado";
+            gatilhoMural.som = clique;
+            gatilhoMural.vibracao = 0f;
+            Parada(controle, "coworking").ativarAoChegar.Add(postIt.gameObject);
 
             // I5 - maçaneta e porta de vidro da sala dos fundos
             var macaneta = CriarPorta(grupoInteracoes, modelo, clique);
@@ -1199,17 +1221,40 @@ namespace SebraeGuides.Ferramentas
             return fotos.ToArray();
         }
 
-        static GameObject CriarPostIt(Transform pai)
+        // Post-it em branco no canto do mural, já de frente para quem chega ao coworking (antes ficava deitado
+        // na estante a 1,82 m de altura, a uns 3 m do quadro, e era quase impossível de usar no simulador).
+        // A ideia escolhida na fala C3 aparece escrita nele (MuralDeIdeias).
+        static PostIt CriarPostIt(Transform pai, Transform mural)
         {
-            var raiz = Filho(pai, "I4 Post-it (estante)");
-            raiz.position = new Vector3(-70.72f, 1.819f, -65.30f);
-            raiz.rotation = Quaternion.Euler(90f, 0f, 0f);
+            var raiz = Filho(pai, "I4 Post-it (canto do mural)");
+            raiz.SetPositionAndRotation(mural.TransformPoint(new Vector3(0.45f, -0.15f, -0.035f)), mural.rotation);
 
+            // A parte visual fica separada para crescer quando o raio aponta e dar um pulinho quando a ideia é escrita.
+            var visual = Filho(raiz, "Visual");
             var corpo = GameObject.CreatePrimitive(PrimitiveType.Cube);
             corpo.name = "Corpo";
-            corpo.transform.SetParent(raiz, false);
-            corpo.transform.localScale = new Vector3(0.12f, 0.12f, 0.015f);
+            corpo.transform.SetParent(visual, false);
+            corpo.transform.localScale = new Vector3(0.15f, 0.15f, 0.012f);
+            Object.DestroyImmediate(corpo.GetComponent<Collider>());
             Pintar(corpo, Mat("PostIt", new Color(1f, 0.86f, 0.2f)));
+
+            var objetoTexto = new GameObject("Texto da ideia", typeof(RectTransform));
+            objetoTexto.transform.SetParent(visual, false);
+            objetoTexto.transform.localPosition = new Vector3(0f, 0f, 0.0075f); // na face virada para o visitante
+            objetoTexto.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            ((RectTransform)objetoTexto.transform).sizeDelta = new Vector2(0.13f, 0.13f);
+            var texto = objetoTexto.AddComponent<TextMeshPro>();
+            texto.text = string.Empty;
+            texto.enableAutoSizing = true;
+            texto.fontSizeMax = 0.5f; // letra grande: o post-it tem 15 cm e é lido a uns 1,7 m
+            texto.fontSizeMin = 0.15f;
+            texto.fontStyle = FontStyles.Bold;
+            texto.alignment = TextAlignmentOptions.Center;
+            texto.color = new Color(0.12f, 0.16f, 0.35f);
+
+            // Colisor um pouco maior que o papel: mais fácil de acertar com o raio.
+            var colisor = raiz.gameObject.AddComponent<BoxCollider>();
+            colisor.size = new Vector3(0.18f, 0.18f, 0.04f);
 
             var corpoFisico = raiz.gameObject.AddComponent<Rigidbody>();
             corpoFisico.mass = 0.02f;
@@ -1218,28 +1263,44 @@ namespace SebraeGuides.Ferramentas
             var pegar = raiz.gameObject.AddComponent<XRGrabInteractable>();
             pegar.throwOnDetach = false;
             pegar.useDynamicAttach = true;
-            // Vem para a mão quando pego de longe. No padrão do template o objeto fica na ponta do raio,
-            // e assim o post-it não chegaria até o mural.
+            // Vem para a mão quando pego de longe. No padrão do template o objeto fica na ponta do raio.
             pegar.farAttachMode = InteractableFarAttachMode.Near;
-            raiz.gameObject.AddComponent<PostIt>();
+            pegar.enabled = false; // em branco não dá para pegar: o MuralDeIdeias liga depois que a ideia é escrita
+
+            var postIt = raiz.gameObject.AddComponent<PostIt>();
+            postIt.texto = texto;
+            postIt.visual = visual;
             raiz.gameObject.AddComponent<FisicaAoSoltar>();
-            return raiz.gameObject;
+            var destaque = raiz.gameObject.AddComponent<DestaqueAoApontar>();
+            destaque.alvo = visual;
+            return postIt;
         }
 
-        static void CriarMural(Transform pai, AudioClip clique)
+        const string NomeEncaixePostIt = "Encaixe do post-it";
+
+        static Transform CriarMural(Transform pai)
         {
             var raiz = Filho(pai, "I4 Mural de ideias (quadro)");
             raiz.position = new Vector3(-68.21f, 1.25f, -67.30f);
             raiz.rotation = Quaternion.identity;
 
+            // Encaixe para colar com a mão (óculos). Raio maior que antes (era 0,2 m).
             var area = raiz.gameObject.AddComponent<SphereCollider>();
             area.isTrigger = true;
-            area.radius = 0.2f;
-            raiz.gameObject.AddComponent<SocketMuralIdeias>();
-            var gatilho = raiz.gameObject.AddComponent<GatilhoInteracao>();
-            gatilho.evento = "postit_colado";
-            gatilho.som = clique;
-            gatilho.vibracao = 0f;
+            area.radius = 0.3f;
+            var socket = raiz.gameObject.AddComponent<SocketMuralIdeias>();
+            var encaixe = Filho(raiz, NomeEncaixePostIt);
+            encaixe.localPosition = new Vector3(0f, 0f, -0.035f); // rente ao quadro
+            encaixe.localRotation = Quaternion.identity;
+            socket.attachTransform = encaixe;
+
+            // Botão "Colar aqui" no centro do mural: aponta e aperta o gatilho, igual nos botões do guia.
+            // Fica escondido até a ideia ser escrita (MuralDeIdeias).
+            var canvas = CriarCanvas("Botao Colar aqui", raiz, new Vector2(360f, 120f));
+            canvas.transform.localPosition = new Vector3(0f, 0f, -0.04f);
+            canvas.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            var botaoColar = Botao("Colar aqui", (RectTransform)canvas.transform, "Colar aqui", 360f, 120f);
+            botaoColar.gameObject.SetActive(false);
 
             var alvo = GameObject.CreatePrimitive(PrimitiveType.Quad);
             alvo.name = "Alvo";
@@ -1251,7 +1312,8 @@ namespace SebraeGuides.Ferramentas
             Pintar(alvo, Mat("Mural_Alvo", new Color(1f, 0.95f, 0.7f)));
 
             Texto3D("Titulo", raiz, "Mural de ideias", 0.8f, new Vector3(0f, 0.42f, -0.05f), CorDestaque);
-            Texto3D("Dica", raiz, "Cole aqui", 0.45f, new Vector3(0f, 0.2f, -0.05f), new Color(0.2f, 0.2f, 0.25f));
+            Texto3D("Dica", raiz, "Sua ideia aqui", 0.45f, new Vector3(0f, 0.2f, -0.05f), new Color(0.2f, 0.2f, 0.25f));
+            return raiz;
         }
 
         static GameObject CriarPorta(Transform pai, Transform modelo, AudioClip clique)
