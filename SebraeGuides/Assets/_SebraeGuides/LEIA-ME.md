@@ -49,18 +49,18 @@ Controles no Quest:
 | Parada | Interação que libera a próxima |
 |---|---|
 | A0 Recepção | Pegar o crachá de pé no suporte do balcão (ele cresce quando o raio aponta e some quando é solto) |
-| A1 Arena | Botão "Ligar a TV" no painel |
+| A1 Arena | Botão "Ligar a TV" no painel. "Quero saber mais" mostra a fala A3M e o texto extra do painel |
 | A2 Coworking | Escolher uma das 3 ideias no balão do guia (ela aparece escrita no post-it, no canto do mural) e colar: apontar para "Colar aqui" e apertar o gatilho, ou, de óculos, pegar o post-it e soltar no quadro. As ideias ficam na fala C3 do roteiro (evento `ideia:texto do post-it`) |
-| A3 Copa | (só conversa) |
+| A3 Copa | (só conversa). "Quero saber mais" mostra a fala K2M e o texto extra do painel |
 | A4 Sala dos fundos | Puxar a maçaneta da porta de vidro |
-| Volta à recepção | Encerramento, com "Recomeçar" ou "Encerrar" |
+| Volta à recepção | O botão "Voltar" da fala F3 leva o visitante direto para a recepção, virado para o guia (a recepção fica longe da sala dos fundos e atrás de paredes, fora do alcance do raio). Depois vem o encerramento, com "Recomeçar" ou "Encerrar" |
 
 ## 5. Onde mexer
 
 | Quero mudar... | Onde |
 |---|---|
 | Texto das falas e botões | Menu Sebrae Guides > Editar as falas do guia (arquivo `Dados/RoteiroGuia.asset`) |
-| Áudio de uma fala | Pasta `Audio/Falas`: um arquivo por fala com o ID no nome (`R1.ogg`, `A1.ogg`...). Para trocar, substitua o arquivo e rode o item 1 do menu, que liga cada áudio à sua fala. Vozes atuais: ElevenLabs, voz "Moutella", plano gratuito (crédito obrigatório: "Vozes geradas com ElevenLabs (elevenlabs.io)"). Todas as 22 falas têm voz |
+| Áudio de uma fala | Pasta `Audio/Falas`: um arquivo por fala com o ID no nome (`R1.ogg`, `A1.ogg`...). Para trocar, substitua o arquivo e rode o item 1 do menu, que liga cada áudio à sua fala. Vozes atuais: ElevenLabs, voz "Moutella", plano gratuito (crédito obrigatório: "Vozes geradas com ElevenLabs (elevenlabs.io)"). Todas as 24 falas têm voz |
 | Título e texto de um painel | Hierarchy > Sebraelab360 (gerado) > Pontos de interesse > POI ... (componente Ponto De Interesse) |
 | Fotos da TV | Pasta `Fotos`: as imagens entram em ordem de nome (TV_01, TV_02...) e as legendas ficam em `Fotos/legendas.txt` ("legenda \| crédito", uma linha por foto). Depois de trocar, rode o item 1 do menu. Fotos atuais: Google Maps (contribuições de visitantes) |
 | Modelo do guia | O guia é o Professor Otávio (`Modelos/ProfessorOtavio_Guia.fbx`, 42 mil triângulos, 4 animações). Para trocar, substitua esse FBX por outro com o mesmo nome e rode o item 1 do menu. Não coloque XR Interactable nem colisor no guia: ele rouba o raio dos botões do balão |
@@ -70,7 +70,7 @@ Controles no Quest:
 | Luz calculada (bake) | Pasta `Scenes/Visita`. Para refazer: Sebrae Guides > Refazer a luz da Visita (bake) |
 | Câmera do projetor | Hierarchy > Sebraelab360 (gerado) > Camera do projetor. Só liga com o óculos no Link |
 
-Os textos das falas e dos painéis são os finais da equipe (os da branch `edge-tts`, de nov/2026), com a C3/C3B do post-it. Ao rodar o item 1, o roteiro recebe esses textos, mas uma fala editada à mão no RoteiroGuia não é trocada.
+Os textos das falas e dos painéis são os finais da equipe (os da branch `edge-tts`, de nov/2026), com a C3/C3B do post-it e a A3M/K2M do "Quero saber mais" (nov/2026). Ao rodar o item 1, o roteiro recebe esses textos, mas uma fala editada à mão no RoteiroGuia não é trocada.
 
 Atenção: se você rodar o item 1 do menu de novo, ajustes feitos à mão dentro de "Sebraelab360 (gerado)" se perdem. As falas (RoteiroGuia.asset) ficam.
 
@@ -84,7 +84,7 @@ Atenção: se você rodar o item 1 do menu de novo, ajustes feitos à mão dentr
 
 | Script | Função |
 |---|---|
-| ControleVisita | Ordem das paradas, eventos, contador "Espaços visitados", fim da visita |
+| ControleVisita | Ordem das paradas, eventos, contador "Espaços visitados", volta automática à recepção (opção "Voltar Teleportando"), fim da visita |
 | DialogoGuia | Balão de fala com botões |
 | RoteiroGuia | Arquivo com as falas (ScriptableObject) |
 | GuiaNPC | Guia: troca de posição e olha para o visitante |

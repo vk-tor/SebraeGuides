@@ -32,7 +32,9 @@ namespace SebraeGuides.Ferramentas
                 F("A2", "Aperte o botão Ligar a TV, no painel à sua frente, para ver alguns eventos que já passaram por aqui.",
                     "Aponte para o botão Ligar a TV e aperte o gatilho."),
                 F("A3", "Agora vamos conhecer o espaço de coworking.", null,
-                    Op("Quero saber mais", "A3", "mais"), Op("Próximo ponto", null, "ir_coworking")),
+                    Op("Quero saber mais", "A3M", "mais"), Op("Próximo ponto", null, "ir_coworking")),
+                F("A3M", "A arena também recebe demodays, hackathons, painéis com especialistas e encontros gratuitos que conectam empreendedores e estudantes.", null,
+                    Op("Próximo ponto", null, "ir_coworking")),
 
                 // Coworking
                 F("C1", "No coworking, empreendedores dividem as estações de trabalho e os sofás e trabalham lado a lado.", null,
@@ -53,7 +55,9 @@ namespace SebraeGuides.Ferramentas
                 F("K1", "Esta é a copa. Muita parceria importante começa numa conversa informal durante o café.", null,
                     Op("Continuar", "K2")),
                 F("K2", "Nas mesas ao lado acontecem reuniões rápidas, conexões e mentorias para novos negócios.", null,
-                    Op("Quero saber mais", "K2", "mais"), Op("Próximo ponto", null, "ir_fundos")),
+                    Op("Quero saber mais", "K2M", "mais"), Op("Próximo ponto", null, "ir_fundos")),
+                F("K2M", "Nas mesas e na área de convivência acontecem mentorias rápidas e trocas de experiência. Muitas dessas conversas viram novas parcerias.", null,
+                    Op("Próximo ponto", null, "ir_fundos")),
 
                 // Sala dos fundos
                 F("F1", "Chegamos à sala dos fundos. Puxe a maçaneta para abrir a porta de vidro.",
@@ -151,6 +155,47 @@ namespace SebraeGuides.Ferramentas
                 roteiro.falas.Insert(indiceC3 >= 0 ? indiceC3 + 1 : roteiro.falas.Count, novaC3B);
                 mudou = true;
             }
+            return mudou;
+        }
+
+        // "Quero saber mais": cada botão leva a uma fala própria (A3M na arena, K2M na copa) em vez de repetir a fala.
+        static readonly (string fala, string falaMais)[] SaberMais = { ("A3", "A3M"), ("K2", "K2M") };
+
+        /// <summary>
+        /// Leva as falas do "Quero saber mais" (A3M e K2M) para um roteiro já existente: cria a fala que falta logo
+        /// depois da A3/K2 e faz o botão "Quero saber mais" apontar para ela, se ele ainda repete a própria fala.
+        /// Devolve true se mudou algo.
+        /// </summary>
+        public static bool AtualizarFalasSaberMais(RoteiroGuia roteiro)
+        {
+            if (!roteiro || roteiro.falas == null) return false;
+            var padrao = UnityEngine.ScriptableObject.CreateInstance<RoteiroGuia>();
+            Preencher(padrao);
+
+            bool mudou = false;
+            foreach (var (idFala, idMais) in SaberMais)
+            {
+                int indice = roteiro.falas.FindIndex(f => f != null && f.id == idFala);
+                if (indice < 0) continue;
+
+                if (!roteiro.falas.Exists(f => f != null && f.id == idMais))
+                {
+                    roteiro.falas.Insert(indice + 1, padrao.falas.Find(f => f.id == idMais));
+                    mudou = true;
+                }
+
+                var fala = roteiro.falas[indice];
+                if (fala.opcoes == null) continue;
+                foreach (var opcao in fala.opcoes)
+                {
+                    if (opcao != null && opcao.evento == "mais" && (string.IsNullOrEmpty(opcao.proximaFala) || opcao.proximaFala == idFala))
+                    {
+                        opcao.proximaFala = idMais;
+                        mudou = true;
+                    }
+                }
+            }
+            UnityEngine.Object.DestroyImmediate(padrao);
             return mudou;
         }
 

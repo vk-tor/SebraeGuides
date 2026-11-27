@@ -167,13 +167,15 @@ namespace SebraeGuides.Ferramentas
                 var roteiro = CarregarOuCriarRoteiro(false);
                 bool postItNovo = RoteiroPadrao.AtualizarFalasDoPostIt(roteiro);
                 bool textosNovos = RoteiroPadrao.AtualizarTextosFinais(roteiro);
-                if (postItNovo || textosNovos)
+                bool saberMaisNovo = RoteiroPadrao.AtualizarFalasSaberMais(roteiro);
+                if (postItNovo || textosNovos || saberMaisNovo)
                 {
                     EditorUtility.SetDirty(roteiro);
                     AssetDatabase.SaveAssets();
                     Debug.Log("[Sebrae Guides] Roteiro atualizado:" +
                               (postItNovo ? " falas do post-it (C3 com 3 ideias e C3B nova);" : "") +
                               (textosNovos ? " textos finais da equipe (R1, A1, A3, C4, K1, K2, F2, F3, FIM e nome do guia);" : "") +
+                              (saberMaisNovo ? " falas do Quero saber mais (A3M e K2M);" : "") +
                               " falas editadas à mão não mudam.");
                 }
                 VincularAudiosDasFalas(roteiro);

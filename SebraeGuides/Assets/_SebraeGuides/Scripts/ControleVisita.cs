@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 
 namespace SebraeGuides
 {
@@ -65,6 +66,14 @@ namespace SebraeGuides
         [Header("Tempos")]
         public float atrasoInicial = 1.5f;
         public float segundosAteFechar = 4f;
+
+        [Header("Volta à recepção")]
+        [Tooltip("No botão Voltar do fim da visita, leva o visitante direto para o ponto de teleporte da recepção. " +
+                 "A recepção fica longe da sala dos fundos e atrás de paredes, fora do alcance do raio de teleporte.")]
+        public bool voltarTeleportando = true;
+
+        [Tooltip("Provedor de teleporte do XR Origin. Vazio = usa o do ponto de teleporte da recepção ou procura na cena.")]
+        public TeleportationProvider teleporte;
 
         int atual;
         bool voltando;
@@ -246,10 +255,53 @@ namespace SebraeGuides
 
             if (guia && inicio.posicaoGuia) guia.IrPara(inicio.posicaoGuia);
             TrocarLadoDoBalao(inicio.balaoAEsquerda);
+
+            if (voltarTeleportando && LevarParaRecepcao(inicio))
+            {
+                // O encerramento começa quando o guia já reapareceu na recepção.
+                StartCoroutine(FinalizarDepois(guia ? guia.duracaoTroca * 2f + 0.2f : 0.5f));
+                return;
+            }
+
+            // Sem teleporte automático: o visitante vai até a recepção pela placa "Próxima parada".
             if (marcador && inicio.pontoTeleporte) marcador.MostrarEm(inicio.pontoTeleporte.transform);
             if (dialogo) dialogo.Mostrar(falaIndoParaProxima);
 
             if (inicio.poi && inicio.poi.JogadorDentro) Finalizar();
+        }
+
+        /// <summary>Teleporta o visitante para o ponto da recepção, virado para o guia. Devolve false se não deu.</summary>
+        bool LevarParaRecepcao(ParadaVisita inicio)
+        {
+            if (!inicio.pontoTeleporte) return false;
+
+            var ancora = inicio.pontoTeleporte.GetComponentInChildren<TeleportationAnchor>(true);
+            var provedor = teleporte;
+            if (!provedor && ancora) provedor = ancora.teleportationProvider;
+            if (!provedor) provedor = FindAnyObjectByType<TeleportationProvider>();
+            if (!provedor)
+            {
+                Debug.LogWarning("[Visita] Não achei o Teleportation Provider do XR Origin; o visitante volta pela placa Próxima parada.");
+                return false;
+            }
+
+            var alvo = ancora && ancora.teleportAnchorTransform ? ancora.teleportAnchorTransform : inicio.pontoTeleporte.transform;
+            var pedido = new TeleportRequest
+            {
+                destinationPosition = alvo.position,
+                destinationRotation = alvo.rotation,
+                matchOrientation = MatchOrientation.TargetUpAndForward,
+                requestTime = Time.time,
+            };
+            bool ok = provedor.QueueTeleportRequest(pedido);
+            if (ok) Debug.Log("[Visita] Visitante levado de volta para a recepção.");
+            return ok;
+        }
+
+        IEnumerator FinalizarDepois(float espera)
+        {
+            yield return new WaitForSeconds(espera);
+            Finalizar();
         }
 
         void Finalizar()

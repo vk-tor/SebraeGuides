@@ -16,6 +16,11 @@ namespace SebraeGuides.Ferramentas
         [MenuItem(Menu + "Ir para o coworking (post-it)", false, 41)] static void Coworking() => IrPara("coworking");
         [MenuItem(Menu + "Ir para a copa", false, 42)] static void Copa() => IrPara("copa");
         [MenuItem(Menu + "Ir para a sala dos fundos", false, 43)] static void Fundos() => IrPara("fundos");
+        [MenuItem(Menu + "Voltar à recepção (botão Voltar da F3)", false, 44)] static void Retorno()
+        {
+            if (!ControleVisita.Instancia) Debug.LogWarning("[Teste] Abra a cena Visita e aperte Play antes de usar este atalho.");
+            else ControleVisita.Enviar("ir_retorno");
+        }
 
         [MenuItem(Menu + "Apertar o 1º botão do balão", false, 60)] static void PrimeiroBotao() => ApertarBotaoDoBalao(0);
         [MenuItem(Menu + "Apertar \"Colar aqui\" no mural", false, 61)] static void ColarAqui()
@@ -29,6 +34,7 @@ namespace SebraeGuides.Ferramentas
         [MenuItem(Menu + "Ir para o coworking (post-it)", true)]
         [MenuItem(Menu + "Ir para a copa", true)]
         [MenuItem(Menu + "Ir para a sala dos fundos", true)]
+        [MenuItem(Menu + "Voltar à recepção (botão Voltar da F3)", true)]
         [MenuItem(Menu + "Apertar o 1º botão do balão", true)]
         [MenuItem(Menu + "Apertar \"Colar aqui\" no mural", true)]
         static bool SoNoPlay() => EditorApplication.isPlaying;

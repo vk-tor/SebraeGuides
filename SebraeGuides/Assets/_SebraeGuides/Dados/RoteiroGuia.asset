@@ -76,8 +76,16 @@ MonoBehaviour:
     audio: {fileID: 8300000, guid: 0a125c1b7c1ce554a983b763379c1300, type: 3}
     opcoes:
     - rotulo: Quero saber mais
-      proximaFala: A3
+      proximaFala: A3M
       evento: mais
+    - rotulo: "Pr\xF3ximo ponto"
+      proximaFala: 
+      evento: ir_coworking
+  - id: A3M
+    texto: "A arena tamb\xE9m recebe demodays, hackathons, pain\xE9is com especialistas e encontros gratuitos que conectam empreendedores e estudantes."
+    dica: 
+    audio: {fileID: 8300000, guid: 3ba0d58fceab49bfa042f3955d9faf1f, type: 3}
+    opcoes:
     - rotulo: "Pr\xF3ximo ponto"
       proximaFala: 
       evento: ir_coworking
@@ -144,8 +152,16 @@ MonoBehaviour:
     audio: {fileID: 8300000, guid: 9afb6d54651649c43a89b7666e50e584, type: 3}
     opcoes:
     - rotulo: Quero saber mais
-      proximaFala: K2
+      proximaFala: K2M
       evento: mais
+    - rotulo: "Pr\xF3ximo ponto"
+      proximaFala: 
+      evento: ir_fundos
+  - id: K2M
+    texto: "Nas mesas e na \xE1rea de conviv\xEAncia acontecem mentorias r\xE1pidas e trocas de experi\xEAncia. Muitas dessas conversas viram novas parcerias."
+    dica: 
+    audio: {fileID: 8300000, guid: bbc73b380dae4e3da3e4a6dd2c98e1ac, type: 3}
+    opcoes:
     - rotulo: "Pr\xF3ximo ponto"
       proximaFala: 
       evento: ir_fundos
